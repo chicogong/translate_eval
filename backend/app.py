@@ -7,6 +7,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import glob
 import re
+from typing import List, Dict
 
 # Load environment variables
 load_dotenv()
@@ -254,6 +255,88 @@ def api_evaluate():
     result = evaluate_translation(source_lang, target_lang, source_text, translation)
     logger.info(f"Evaluation API result: success={result['success']}")
     return jsonify(result)
+
+# ========= Batch Evaluation Utilities =========
+
+def collect_results(source_lang: str, target_lang: str):
+    """Collect all result dicts for a language pair.
+    Supports both new-style JSON result files (preferred) and legacy plain-text files.
+    Returns a list of dicts (may be partial info for legacy files).
+    """
+    results_path = PROJECT_ROOT / f"data/results/{source_lang}-{target_lang}"
+    if not results_path.exists():
+        return []
+
+    result_dicts: List[Dict] = []
+    pattern = "test_suite_line_*_result.txt"
+    for file_path in results_path.glob(pattern):
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                if not content:
+                    continue
+                # If content looks like JSON (starts with { or [), attempt to parse
+                if content[0] in "[{":
+                    result = json.loads(content)
+                else:
+                    # Legacy plain text translation; build minimal dict
+                    # Extract line number from filename
+                    m = re.search(r"line_(\d+)_", file_path.name)
+                    line_num = int(m.group(1)) if m else 0
+                    result = {
+                        "source_lang": source_lang,
+                        "target_lang": target_lang,
+                        "line_number": line_num,
+                        "source_text": "N/A",
+                        "translation": content,
+                        "evaluation_score": None,
+                        "justification": "Legacy result – no evaluation data",
+                    }
+                result_dicts.append(result)
+        except json.JSONDecodeError:
+            logger.warning(f"Skipping non-JSON result file {file_path} (invalid JSON)")
+        except Exception as e:
+            logger.error(f"Failed to read result file {file_path}: {e}")
+
+    result_dicts.sort(key=lambda x: x.get("line_number", 0))
+    return result_dicts
+
+# Helper to compute aggregate stats
+def summarize_results(results: List[Dict]):
+    """Return average score and BLEU over numeric entries."""
+    scores = [r.get("evaluation_score") for r in results if isinstance(r.get("evaluation_score"), (int, float))]
+    bleus = [r.get("bleu_score") for r in results if isinstance(r.get("bleu_score"), (int, float))]
+    avg_score = round(sum(scores) / len(scores), 2) if scores else None
+    avg_bleu = round(sum(bleus) / len(bleus), 4) if bleus else None
+    return {"avg_score": avg_score, "avg_bleu": avg_bleu, "count": len(results)}
+
+# ========= New Routes =========
+
+@app.route('/batch')
+def batch_index():
+    """Render batch evaluation dashboard."""
+    return render_template('batch.html', languages=LANGUAGES)
+
+@app.route('/api/results', methods=['GET'])
+def api_results():
+    """Return aggregated results for a given language pair.
+    Query params: source_lang, target_lang.
+    """
+    source_lang = request.args.get('source_lang')
+    target_lang = request.args.get('target_lang')
+
+    if not source_lang or not target_lang:
+        return jsonify({"success": False, "error": "source_lang and target_lang are required."}), 400
+
+    if source_lang == target_lang:
+        return jsonify({"success": False, "error": "source_lang and target_lang must be different."}), 400
+
+    results = collect_results(source_lang, target_lang)
+    if not results:
+        return jsonify({"success": False, "error": "No results found for the specified language pair."})
+
+    summary = summarize_results(results)
+    return jsonify({"success": True, **summary, "results": results})
 
 if __name__ == '__main__':
     host = os.environ.get('FLASK_HOST', '127.0.0.1')
