@@ -1,0 +1,1 @@
+Un desafío fundamental en el procesamiento del lenguaje natural es la resolución de la ambigüedad léxica en escenarios dependientes del contexto.

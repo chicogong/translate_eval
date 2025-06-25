@@ -1,0 +1,1 @@
+El novedoso algoritmo aprovecha un mecanismo de atención de múltiples cabezas para procesar dependencias de largo alcance en datos secuenciales, superando a modelos anteriores en conjuntos de datos de referencia.

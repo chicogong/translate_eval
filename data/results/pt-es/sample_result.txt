@@ -1,0 +1,1 @@
+El nuevo algoritmo utiliza un mecanismo de atención multicabezal para procesar dependencias de largo alcance en datos secuenciales, superando a los modelos anteriores en conjuntos de datos de referencia.

@@ -1,0 +1,20 @@
+本研究では、市場のボラティリティの主要な要因を特定するために、統計的回帰モデルを採用しています。
+
+（ほんけんきゅうでは、しじょうのぼらてぃりてぃのしゅようなよういんをとくていするために、とうけいてきかいきもでるをさいようしています。）
+
+Explanation:
+1. TERMINOLOGY: 
+   - "modelos de regresión estadística" → "統計的回帰モデル" (standard technical term)
+   - "volatilidad del mercado" → "市場のボラティリティ" (common financial term)
+
+2. HONORIFIC LEVEL:
+   - Used formal academic writing style with "～しています" ending
+
+3. SENTENCE STRUCTURE:
+   - Changed from SVO to SOV pattern typical in Japanese
+   - Added topic marker "では" to indicate the research context
+   - Used "ために" to indicate purpose
+
+4. CULTURAL ADAPTATION:
+   - Maintained technical financial terminology as it is internationally understood
+   - Used formal academic writing style appropriate for Japanese research papers

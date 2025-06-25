@@ -1,0 +1,1 @@
+La investigación emplea modelos de regresión estadística para identificar los principales factores que impulsan la volatilidad del mercado.

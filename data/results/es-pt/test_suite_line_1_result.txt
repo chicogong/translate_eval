@@ -1,0 +1,1 @@
+O inovador algoritmo utiliza um mecanismo de atenção de múltiplas cabeças para processar dependências de longo alcance em dados sequenciais, superando os modelos anteriores em conjuntos de dados de referência.

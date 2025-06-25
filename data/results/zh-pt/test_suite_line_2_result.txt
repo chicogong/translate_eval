@@ -1,0 +1,11 @@
+Este artigo propõe um novo método de criptografia quântica, com foco na geração de chaves seguras por meio de pares de fótons emaranhados.
+
+Explicação:
+1. "本文" foi traduzido como "Este artigo" para iniciar o texto de forma natural em português.
+2. "提出" foi traduzido como "propõe", que é o verbo mais adequado em contextos acadêmicos.
+3. "一种新的" foi simplificado para "um novo", mantendo o significado sem redundância.
+4. "量子密码学方法" foi traduzido como "método de criptografia quântica", utilizando a terminologia técnica correta.
+5. "重点研究" foi traduzido como "com foco", que é uma expressão comum em textos acadêmicos em português.
+6. "通过纠缠光子对生成安全密钥" foi traduzido como "na geração de chaves seguras por meio de pares de fótons emaranhados", mantendo a precisão técnica e a fluência da língua portuguesa.
+
+A estrutura da frase foi reorganizada para seguir a sintaxe natural do português, mantendo o significado original e a clareza do texto.

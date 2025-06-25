@@ -1,0 +1,7 @@
+La transformación digital de la cadena de suministro requiere la integración de IoT, blockchain e inteligencia artificial para incrementar la transparencia y la eficiencia.  
+
+**Key considerations:**  
+1. **Terminology consistency:** "Cadeia de suprimentos" is translated as "cadena de suministro," the standard term in Spanish.  
+2. **False friends:** No false friends were present in this case.  
+3. **Sentence restructuring:** The sentence structure was maintained as it aligns naturally with Spanish syntax.  
+4. **Dialect sensitivity:** The translation is neutral and suitable for all Spanish-speaking regions.

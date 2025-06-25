@@ -1,0 +1,18 @@
+この建築設計は、スケーラビリティとフォールトトレランスを向上させるため、マイクロサービスベースのアプローチを採用しています。
+
+Explanation:
+1. TERMINOLOGY: 
+   - "microservices-based approach" → 「マイクロサービスベースのアプローチ」
+   - "scalability" → 「スケーラビリティ」
+   - "fault tolerance" → 「フォールトトレランス」
+
+2. HONORIFIC LEVEL: 
+   - Neutral formal tone appropriate for technical documentation
+
+3. SENTENCE STRUCTURE:
+   - English SVO: "The design incorporates an approach"
+   - Japanese SOV: 「設計はアプローチを採用しています」
+
+4. CULTURAL ADAPTATION:
+   - No specific cultural references needed in this technical context
+   - Direct translation maintains the intended meaning in Japanese technical discourse

@@ -1,0 +1,21 @@
+本論文は、量子暗号技術における新たなアプローチを提示するものであり、特に量子もつれ状態にある光子対を用いた安全な鍵生成に焦点を当てています。
+
+（ほんろんぶんは、りょうしあんごうぎじゅつにおけるあらたなアプローチをていじするものであり、とくにりょうしもつれじょうたいにあるこうしついを用いたあんぜんなかぎせいせいにしょうてんをあてています。）
+
+Explanation of translation choices:
+1. TERMINOLOGY: 
+   - "criptografia quântica" → 量子暗号技術 (りょうしあんごうぎじゅつ)
+   - "pares de fótons emaranhados" → 量子もつれ状態にある光子対 (りょうしもつれじょうたいにあるこうしつい)
+
+2. HONORIFIC LEVEL:
+   - Used formal academic language appropriate for research papers
+   - Employed polite verb forms (提示する, 当てています)
+
+3. SENTENCE STRUCTURE:
+   - Restructured from Portuguese SVO to Japanese SOV pattern
+   - Added appropriate particles (は, における, を, に)
+   - Used ものであり for formal explanation
+
+4. CULTURAL ADAPTATION:
+   - Maintained technical accuracy without need for cultural adaptation
+   - Used standard Japanese academic writing style

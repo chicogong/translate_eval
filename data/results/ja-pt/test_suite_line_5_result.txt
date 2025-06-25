@@ -1,0 +1,9 @@
+Nós analisamos o impacto socioeconômico que o sistema financeiro descentralizado (DeFi) exerce sobre o sistema bancário tradicional.
+
+**Key Translation Notes:**
+1. TERMINOLOGY: "分散型金融" → "sistema financeiro descentralizado" (standard technical term)
+2. IMPLICIT SUBJECT: Added explicit subject "Nós" (We) as required in Portuguese
+3. SENTENCE STRUCTURE: Restructured from SOV to SVO pattern
+4. CULTURAL ADAPTATION: No specific cultural references needed adaptation in this case
+
+The translation maintains technical accuracy while following natural Portuguese syntax and expression patterns.

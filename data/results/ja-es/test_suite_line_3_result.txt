@@ -1,0 +1,12 @@
+Nuestra metodología incluye ensayos clínicos doble ciego controlados con placebo para evaluar la eficacia y seguridad de nuevos compuestos farmacéuticos. 
+
+Explicación de las adaptaciones:
+
+1. "二重盲検プラセボ対照試験" se tradujo como "ensayos clínicos doble ciego controlados con placebo" - terminología técnica estándar en español
+2. Se hizo explícito el sujeto "Nuestra metodología" ya que en japonés se omite frecuentemente
+3. Se reorganizó la estructura de la oración de SOV a SVO: 
+   Japonés: [Metodología] [contiene] [ensayos]
+   Español: [Nuestra metodología] [incluye] [ensayos]
+4. No hubo necesidad de adaptación cultural ya que se trata de un concepto científico universal
+
+La traducción mantiene el tono formal y técnico del original mientras sigue las normas gramaticales y de estilo del español.

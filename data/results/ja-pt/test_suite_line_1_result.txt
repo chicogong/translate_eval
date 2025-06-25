@@ -1,0 +1,1 @@
+Este novo algoritmo utiliza um mecanismo de atenção multi-head para processar dependências de longo alcance em dados sequenciais, demonstrando desempenho superior aos modelos anteriores em conjuntos de dados de referência.

@@ -1,0 +1,1 @@
+This architecture design adopts a microservices-based approach to enhance scalability and fault tolerance.

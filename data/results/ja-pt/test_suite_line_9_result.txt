@@ -1,0 +1,7 @@
+Este estudo investiga a correlação entre a adoção de energias renováveis e a estabilidade a longo prazo da rede elétrica. 
+
+(Explanation of translation choices:
+1. "本研究" was translated as "Este estudo" to make the subject explicit in Portuguese
+2. "再生可能エネルギー" was translated using the standard technical term "energias renováveis"
+3. The SOV structure was converted to SVO to follow Portuguese syntax
+4. The technical terms "相関関係" and "電力網" were translated as "correlação" and "rede elétrica" respectively, using standard Portuguese technical vocabulary)

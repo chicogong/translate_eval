@@ -1,0 +1,15 @@
+A arquitetura proposta adota uma abordagem baseada em microsserviços para aprimorar a escalabilidade e a tolerância a falhas.
+
+Explanation of translation choices:
+
+1. "该架构设计" is translated as "A arquitetura proposta" (The proposed architecture) to maintain a formal tone while sounding natural in Portuguese.
+
+2. "采用" is rendered as "adota" (adopts) - a precise verb that conveys the concept of implementing a specific approach.
+
+3. "基于微服务的方法" becomes "uma abordagem baseada em microsserviços" (a microservices-based approach) - using the standard technical term "microsserviços" and proper adjective-noun agreement.
+
+4. "来增强" is translated as "para aprimorar" (to enhance) - using a more formal and precise verb than the literal "fortalecer".
+
+5. "可伸缩性和容错性" is rendered as "a escalabilidade e a tolerância a falhas" (scalability and fault tolerance) - using standard technical terminology in Portuguese with proper article agreement.
+
+The sentence structure follows natural Portuguese syntax, placing the subject first, followed by the verb and complement, with the purpose clause introduced by "para" (to).

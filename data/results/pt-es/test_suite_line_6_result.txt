@@ -1,0 +1,7 @@
+La investigación emplea modelos de regresión estadística para identificar los principales impulsores de la volatilidad del mercado.  
+
+**Key considerations:**  
+1. **Terminology consistency:** "Modelos de regressão estatística" → "Modelos de regresión estadística" (standard technical term).  
+2. **False friends:** "Impulsionadores" → "Impulsores" (avoids the false cognate "impulsionadores," which is not commonly used in Spanish).  
+3. **Sentence restructuring:** The sentence structure remains natural in Spanish, maintaining the flow of the original.  
+4. **Dialect sensitivity:** The translation is neutral and suitable for all Spanish-speaking regions.

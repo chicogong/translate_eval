@@ -1,0 +1,1 @@
+El diseño arquitectónico incorpora un enfoque basado en microservicios para mejorar la escalabilidad y la tolerancia a fallos.

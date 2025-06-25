@@ -1,0 +1,1 @@
+Este artículo presenta un nuevo enfoque sobre la criptografía cuántica, centrándose en la generación de claves seguras mediante pares de fotones entrelazados.

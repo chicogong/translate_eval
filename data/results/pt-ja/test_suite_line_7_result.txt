@@ -1,0 +1,11 @@
+自然言語処理における基本的な課題の一つは、文脈依存的な場面における語彙的曖昧性の解消です。
+
+（しぜんげんごしょりにおけるきほんてきかだいのひとつは、ぶんみゃくいぞんてきばめんにおけるごいてきあいまいせいのかいしょうです。）
+
+Explanation:
+1. "Um desafio fundamental" → "基本的な課題の一つ" (basic challenge/issue)
+2. "processamento de linguagem natural" → "自然言語処理" (natural language processing - standard Japanese term)
+3. "resolução da ambiguidade lexical" → "語彙的曖昧性の解消" (resolution of lexical ambiguity)
+4. "cenários dependentes do contexto" → "文脈依存的な場面" (context-dependent scenarios)
+
+The sentence structure follows Japanese SOV pattern, with the topic marked by は and the main verb at the end. The translation maintains formal academic tone appropriate for technical writing.

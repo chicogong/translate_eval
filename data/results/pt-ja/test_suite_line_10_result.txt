@@ -1,0 +1,18 @@
+機械学習モデルは、ユーザー生成コンテンツの感情分析を実行するために、精選されたデータセットでトレーニングされました。
+
+Explanation:
+1. TERMINOLOGY: 
+   - "modelo de aprendizado de máquina" → "機械学習モデル" (standard technical term)
+   - "conjunto de dados" → "データセット" (standard technical term)
+   - "análise de sentimentos" → "感情分析" (standard technical term)
+
+2. HONORIFIC LEVEL:
+   - Used neutral formal language appropriate for technical documentation
+
+3. SENTENCE STRUCTURE:
+   - Portuguese SVO: "O modelo foi treinado em um conjunto de dados"
+   - Japanese SOV: "モデルは...データセットでトレーニングされました"
+
+4. CULTURAL ADAPTATION:
+   - No specific cultural references needed adaptation in this technical sentence
+   - Maintained professional tone suitable for Japanese technical documentation

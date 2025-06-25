@@ -1,0 +1,7 @@
+Este estudio emplea un modelo de regresión estadística para identificar los factores clave que impulsan la volatilidad del mercado. 
+
+(Translation notes:
+1. "统计回归模型" is translated as "modelo de regresión estadística" - standard statistical term
+2. "识别" is rendered as "identificar" - appropriate verb choice
+3. "市场波动的关键驱动因素" is restructured as "los factores clave que impulsan la volatilidad del mercado" - natural Spanish syntax with proper noun-adjective agreement
+4. The sentence structure is adjusted to follow Spanish's typical subject-verb-object order while maintaining the original meaning)

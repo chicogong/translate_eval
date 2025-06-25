@@ -1,0 +1,21 @@
+Este diseño de arquitectura incorpora un enfoque basado en microservicios para mejorar la escalabilidad y la tolerancia a fallos.
+
+Explicación de las adaptaciones realizadas:
+
+1. Terminología técnica:
+   - "アーキテクチャ設計" → "diseño de arquitectura" (término estándar en ingeniería de software)
+   - "マイクロサービス" → "microservicios" (término técnico ampliamente aceptado)
+   - "スケーラビリティ" → "escalabilidad"
+   - "フォールトトレランス" → "tolerancia a fallos"
+
+2. Estructura de la oración:
+   - Se reorganizó el orden SOV japonés a SVO en español
+   - Se añadió el artículo "Este" para mayor claridad
+   - Se utilizó la preposición "para" en lugar de "ために" para expresar el propósito
+
+3. Claridad y naturalidad:
+   - Se mantuvo la formalidad del texto original
+   - Se utilizó una estructura gramatical natural en español
+   - Se respetó la precisión técnica del contenido original
+
+La traducción resultante es adecuada para documentos técnicos, académicos o empresariales en español, manteniendo el significado original y utilizando terminología profesional estándar.

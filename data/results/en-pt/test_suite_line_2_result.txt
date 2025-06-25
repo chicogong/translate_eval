@@ -1,0 +1,1 @@
+O sistema utiliza um protocolo de consenso tolerante a falhas bizantinas para garantir a integridade dos dados no livro-razão distribuído, mesmo na presença de nós maliciosos.

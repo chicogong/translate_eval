@@ -1,0 +1,1 @@
+A pesquisa utiliza modelos de regressão estatística para identificar os principais fatores que influenciam a volatilidade do mercado.

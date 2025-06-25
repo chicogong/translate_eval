@@ -1,0 +1,8 @@
+Neste artigo, apresentamos uma nova abordagem para a criptografia quântica, com foco na geração segura de chaves por meio de pares de fótons emaranhados. 
+
+Explicação das adaptações:
+1. "本稿では" foi traduzido como "Neste artigo" para tornar o sujeito explícito
+2. "量子暗号" foi mantido como "criptografia quântica", termo técnico padrão em português
+3. A estrutura SOV foi convertida para SVO: "apresentamos uma nova abordagem"
+4. "エンタングルした光子ペア" foi traduzido como "pares de fótons emaranhados", terminologia técnica correta
+5. A frase foi reorganizada para fluir naturalmente em português, mantendo o significado original

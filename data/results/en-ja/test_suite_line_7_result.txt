@@ -1,0 +1,11 @@
+自然言語処理における重要な課題の一つは、文脈依存のシナリオにおける語彙的曖昧性の解消です。
+
+（しぜんげんごしょりにおけるじゅうようなかだいのひとつは、ぶんみゃくいぞんのシナリオにおけるごいてきあいまいせいのかいしょうです。）
+
+Explanation of translation choices:
+1. "Natural language processing" → 「自然言語処理」: Standard technical term in Japanese
+2. "Key challenge" → 「重要な課題」: Formal expression appropriate for technical/academic context
+3. "Lexical ambiguity" → 「語彙的曖昧性」: Precise technical term
+4. "Context-dependent scenarios" → 「文脈依存のシナリオ」: Maintains technical accuracy while using natural Japanese
+5. SOV structure: The sentence follows the Japanese subject-object-verb pattern, placing the verb 「解消です」 at the end
+6. Formal tone: The sentence uses formal Japanese appropriate for academic/technical writing, without unnecessary honorifics

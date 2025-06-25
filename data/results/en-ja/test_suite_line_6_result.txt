@@ -1,0 +1,11 @@
+本研究では、市場のボラティリティの主要な要因を特定するために、統計的回帰モデルを採用しています。
+
+Explanation:
+1. TERMINOLOGY: "statistical regression models" → "統計的回帰モデル" (standard technical term)
+2. HONORIFIC LEVEL: Neutral academic tone using です・ます体
+3. SENTENCE STRUCTURE: 
+   - English SVO: "The research employs...to identify..."
+   - Japanese SOV: "本研究では...特定するために...採用しています"
+4. CULTURAL ADAPTATION: No specific cultural references needed in this technical context
+
+The translation maintains the formal academic tone while restructuring the sentence to follow natural Japanese syntax.

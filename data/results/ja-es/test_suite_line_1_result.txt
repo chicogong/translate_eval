@@ -1,0 +1,7 @@
+Este nuevo algoritmo utiliza un mecanismo de atención de múltiples cabezas para procesar las dependencias de largo alcance en datos secuenciales, demostrando un rendimiento superior al de los modelos anteriores en conjuntos de datos de referencia. 
+
+[Explanation of translation choices:
+1. "マルチヘッドアテンションメカニズム" → "mecanismo de atención de múltiples cabezas" - Standard technical term in Spanish
+2. Added "Este" as explicit subject to match Spanish syntax
+3. Restructured from SOV to SVO: "Este nuevo algoritmo utiliza" instead of Japanese "この新しいアルゴリズムは...活用して"
+4. Maintained technical accuracy while ensuring natural Spanish flow]

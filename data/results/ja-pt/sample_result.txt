@@ -1,0 +1,1 @@
+Este novo algoritmo utiliza o mecanismo de atenção de múltiplas cabeças para processar relações de dependência de longo prazo em dados sequenciais e demonstra desempenho superior aos modelos anteriores em conjuntos de dados de referência.

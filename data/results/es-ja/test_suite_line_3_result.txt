@@ -1,0 +1,9 @@
+当社の方法論は、新規医薬品化合物の有効性と安全性を評価するため、プラセボ対照二重盲検試験を実施するものです。
+
+[Explanation of translation choices]
+1. "Nuestra metodología implica" → "当社の方法論は" (Our methodology involves) - Using "当社" to indicate the company's ownership in a formal business context
+2. "estudio doble ciego controlado por placebo" → "プラセボ対照二重盲検試験" (placebo-controlled double-blind study) - Using standard Japanese medical research terminology
+3. "para evaluar la eficacia y seguridad" → "有効性と安全性を評価するため" (to evaluate efficacy and safety) - Maintaining technical accuracy while restructuring to Japanese SOV pattern
+4. "del nuevo compuesto farmacéutico" → "新規医薬品化合物の" (of the new pharmaceutical compound) - Using standard pharmaceutical industry terminology
+
+The translation maintains formal academic/business tone while accurately conveying the technical content in natural Japanese sentence structure.

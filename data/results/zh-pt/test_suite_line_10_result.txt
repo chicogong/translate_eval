@@ -1,0 +1,1 @@
+O modelo de aprendizado de máquina foi treinado em um conjunto de dados selecionados para realizar a análise de sentimentos de conteúdo gerado por usuários.

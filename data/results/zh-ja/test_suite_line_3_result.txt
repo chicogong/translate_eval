@@ -1,0 +1,8 @@
+私たちの方法論は、新規薬物化合物の有効性と安全性を評価するための二重盲検プラセボ対照試験を採用しています。
+
+Explanation:
+1. "方法学" is translated as "方法論" (houhouron), which is the standard term in Japanese for methodology.
+2. "双盲" is translated as "二重盲検" (nijuumouken), the standard term for double-blind in medical research.
+3. "安慰剂对照研究" is translated as "プラセボ対照試験" (purasebo taishou shiken), using the standard Japanese term for placebo-controlled study.
+4. The sentence structure is rearranged to follow Japanese SOV (Subject-Object-Verb) syntax, with the verb "採用しています" (saiyou shiteimasu) at the end.
+5. The formal tone is maintained throughout the translation, appropriate for academic or technical writing.

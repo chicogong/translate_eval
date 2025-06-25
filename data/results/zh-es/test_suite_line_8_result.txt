@@ -1,0 +1,9 @@
+Este diseño arquitectónico adopta un enfoque basado en microservicios para mejorar la escalabilidad y la tolerancia a fallos. 
+
+(Translation notes:
+1. "架构设计" translated as "diseño arquitectónico" - standard technical term
+2. "采用" translated as "adopta" - proper verb conjugation
+3. "基于微服务的方法" translated as "enfoque basado en microservicios" - standard technical terminology
+4. "增强" translated as "mejorar" - more natural Spanish expression
+5. "可伸缩性" and "容错性" translated as "escalabilidad" and "tolerancia a fallos" - standard technical terms
+6. Sentence structure adjusted to follow Spanish syntax with subject-verb-object order)

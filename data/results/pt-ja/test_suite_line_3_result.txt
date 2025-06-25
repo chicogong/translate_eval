@@ -1,0 +1,10 @@
+当社の方法論は、新規医薬品化合物の有効性と安全性を評価するため、プラセボ対照二重盲検試験を採用しております。
+
+[Explanation of translation choices]
+1. "Nossa metodologia" → "当社の方法論" (Corporate formal expression)
+2. "estudo duplo-cego" → "二重盲検試験" (Standard medical term)
+3. "controlado por placebo" → "プラセボ対照" (Standard clinical trial terminology)
+4. "avaliar a eficácia e segurança" → "有効性と安全性を評価する" (Standard medical research phrasing)
+5. "novo composto farmacêutico" → "新規医薬品化合物" (Technical pharmaceutical term)
+
+The sentence structure was reorganized to follow Japanese SOV pattern, and formal keigo (～しております) was used to maintain the professional tone of the text.

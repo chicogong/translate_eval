@@ -1,0 +1,21 @@
+この建築プロジェクトは、スケーラビリティとフォールトトレランスを向上させるため、マイクロサービスベースのアプローチを採用しています。
+
+（Kono kenchiku purojekuto wa, sukeerabiriti to fooruto torensu o kōjō suru tame, maikurosaabisu bēsu no apurōchi o saiyō shiteimasu.）
+
+Explanation:
+1. TERMINOLOGY: 
+   - "microsserviços" → マイクロサービス (standard Japanese technical term)
+   - "escalabilidade" → スケーラビリティ (standard Japanese technical term)
+   - "tolerância a falhas" → フォールトトレランス (standard Japanese technical term)
+
+2. HONORIFIC LEVEL: 
+   - Used neutral formal language appropriate for technical documentation (です/ます調)
+
+3. SENTENCE STRUCTURE:
+   - Changed from Portuguese SVO to Japanese SOV pattern
+   - Added topic marker は and object marker を
+   - Used ため to indicate purpose
+
+4. CULTURAL ADAPTATION:
+   - No specific cultural references needed adaptation in this technical context
+   - Maintained direct technical translation as it's universally understood in Japanese IT context

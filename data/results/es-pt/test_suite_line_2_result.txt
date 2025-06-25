@@ -1,0 +1,1 @@
+Este artigo apresenta uma abordagem inovadora da criptografia quântica, focando na geração de chaves seguras por meio de pares de fótons entrelaçados.
