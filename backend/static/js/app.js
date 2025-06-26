@@ -18,6 +18,11 @@ class TranslationApp {
         this.translationText = document.getElementById('translation-text');
         this.charCount = document.getElementById('char-count');
 
+        // Translation settings
+        this.streamModeSelect = document.getElementById('stream-mode');
+        this.temperatureInput = document.getElementById('temperature');
+        this.topPInput = document.getElementById('top-p');
+
         // Buttons
         this.translateBtn = document.getElementById('translate-btn');
         this.clearBtn = document.getElementById('clear-btn');
@@ -130,17 +135,35 @@ class TranslationApp {
         this.showLoading();
         this.translateBtn.disabled = true;
 
+        // Prepare translation parameters
+        const requestBody = {
+            source_lang: sourceLang,
+            target_lang: targetLang,
+            text: text
+        };
+
+        // Add optional parameters if specified
+        if (this.streamModeSelect.value) {
+            requestBody.stream = this.streamModeSelect.value === 'true';
+        }
+        
+        if (this.temperatureInput.value) {
+            requestBody.temperature = parseFloat(this.temperatureInput.value);
+        }
+        
+        if (this.topPInput.value) {
+            requestBody.top_p = parseFloat(this.topPInput.value);
+        }
+
+        console.log('Translation request:', requestBody);
+
         try {
             const response = await fetch('/api/translate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    source_lang: sourceLang,
-                    target_lang: targetLang,
-                    text: text
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const result = await response.json();

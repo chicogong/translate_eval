@@ -1,265 +1,26 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import json
-import requests
 import logging
 from pathlib import Path
-from dotenv import load_dotenv
 import glob
 import re
 from typing import List, Dict
 
-# Load environment variables
-load_dotenv()
-
-# Setup logging
-def setup_logging():
-    """配置日志系统"""
-    # Create logs directory if it doesn't exist
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
-    
-    # Get logging configuration from environment
-    log_level = os.environ.get('LOG_LEVEL', 'INFO').upper()
-    log_file = os.environ.get('LOG_FILE', 'logs/app.log')
-    log_format = os.environ.get('LOG_FORMAT', 
-        '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d in %(funcName)s] - %(message)s'
-    )
-    
-    # Configure logging
-    logging.basicConfig(
-        level=getattr(logging, log_level),
-        format=log_format,
-        handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
-            logging.StreamHandler()
-        ]
-    )
-    
-    return logging.getLogger(__name__)
+from config import LANGUAGES, DEFAULT_VERSION, PROJECT_ROOT, FLASK_CONFIG
+from utils import setup_logging, format_run_id, validate_language_pair, detect_language
+from services import TranslationService, EvaluationService
 
 # Initialize logging
 logger = setup_logging()
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# Get the project root directory
-PROJECT_ROOT = Path(__file__).parent.parent
+# Initialize services
+translation_service = TranslationService()
+evaluation_service = EvaluationService()
 
-# Language mapping
-LANGUAGES = {
-    'en': 'English',
-    'zh': '中文',
-    'ja': '日本語',
-    'pt': 'Português',
-    'es': 'Español'
-}
 
-# Default version tag (can be overridden via env)
-DEFAULT_VERSION = os.environ.get("RESULT_VERSION", "v1")
-
-def get_translation_config():
-    """获取翻译API配置"""
-    config = {
-        'api_key': os.environ.get('TRANSLATION_API_KEY'),
-        'api_url': os.environ.get('TRANSLATION_API_URL'),
-        'model': os.environ.get('TRANSLATION_MODEL')
-    }
-    
-    if not config['api_key']:
-        logger.error("Translation API key not found in environment variables")
-    
-    logger.debug(f"Translation API config loaded: url={config['api_url']}, model={config['model']}")
-    return config
-
-def get_evaluation_config():
-    """获取评估API配置"""
-    config = {
-        'api_key': os.environ.get('EVALUATION_API_KEY'),
-        'api_url': os.environ.get('EVALUATION_API_URL'),
-        'model': os.environ.get('EVALUATION_MODEL')
-    }
-    
-    if not config['api_key']:
-        logger.error("Evaluation API key not found in environment variables")
-    
-    logger.debug(f"Evaluation API config loaded: url={config['api_url']}, model={config['model']}")
-    return config
-
-def get_translation_prompt(source_lang: str, target_lang: str) -> str:
-    """Get translation prompt for language pair"""
-    # Translation prompts for different language pairs
-    prompts = {
-        "en-zh": "You are an expert English to Chinese translator. Translate the following English text into natural, fluent Chinese. Use Simplified Chinese characters and maintain the technical accuracy of the original text.",
-        "zh-en": "You are an expert Chinese to English translator. Translate the following Chinese text into natural, fluent English. Maintain the technical accuracy and formal tone of the original text.",
-        "en-ja": "You are an expert English to Japanese translator. Translate the following English text into natural, fluent Japanese. Use appropriate formal language and maintain technical accuracy.",
-        "ja-en": "You are an expert Japanese to English translator. Translate the following Japanese text into natural, fluent English. Maintain the technical accuracy and formal tone.",
-        "en-es": "You are an expert English to Spanish translator. Translate the following English text into natural, fluent Spanish. Maintain technical accuracy and use formal language.",
-        "es-en": "You are an expert Spanish to English translator. Translate the following Spanish text into natural, fluent English. Maintain technical accuracy and formal tone.",
-        "en-pt": "You are an expert English to Portuguese translator. Translate the following English text into natural, fluent Portuguese. Maintain technical accuracy and use formal language.",
-        "pt-en": "You are an expert Portuguese to English translator. Translate the following Portuguese text into natural, fluent English. Maintain technical accuracy and formal tone.",
-        "zh-ja": "You are an expert Chinese to Japanese translator. Translate the following Chinese text into natural, fluent Japanese. Use appropriate formal language.",
-        "ja-zh": "You are an expert Japanese to Chinese translator. Translate the following Japanese text into natural, fluent Chinese using Simplified Chinese characters.",
-        "zh-es": "You are an expert Chinese to Spanish translator. Translate the following Chinese text into natural, fluent Spanish. Maintain technical accuracy.",
-        "es-zh": "You are an expert Spanish to Chinese translator. Translate the following Spanish text into natural, fluent Chinese using Simplified Chinese characters.",
-        "zh-pt": "You are an expert Chinese to Portuguese translator. Translate the following Chinese text into natural, fluent Portuguese. Maintain technical accuracy.",
-        "pt-zh": "You are an expert Portuguese to Chinese translator. Translate the following Portuguese text into natural, fluent Chinese using Simplified Chinese characters.",
-        "ja-es": "You are an expert Japanese to Spanish translator. Translate the following Japanese text into natural, fluent Spanish. Maintain technical accuracy.",
-        "es-ja": "You are an expert Spanish to Japanese translator. Translate the following Spanish text into natural, fluent Japanese. Use appropriate formal language.",
-        "ja-pt": "You are an expert Japanese to Portuguese translator. Translate the following Japanese text into natural, fluent Portuguese. Maintain technical accuracy.",
-        "pt-ja": "You are an expert Portuguese to Japanese translator. Translate the following Portuguese text into natural, fluent Japanese. Use appropriate formal language.",
-        "es-pt": "You are an expert Spanish to Portuguese translator. Translate the following Spanish text into natural, fluent Portuguese. Maintain technical accuracy.",
-        "pt-es": "You are an expert Portuguese to Spanish translator. Translate the following Portuguese text into natural, fluent Spanish. Maintain technical accuracy."
-    }
-    
-    lang_pair = f"{source_lang}-{target_lang}"
-    return prompts.get(lang_pair, f"Translate the following text from {source_lang} to {target_lang}.")
-
-def translate_text(source_lang: str, target_lang: str, text: str) -> dict:
-    """Translate text using the API"""
-    logger.info(f"Starting translation: {source_lang} -> {target_lang}, text length: {len(text)}")
-    
-    config = get_translation_config()
-    if not config['api_key']:
-        logger.error("Translation API key not available")
-        return {"success": False, "error": "Translation API key not found"}
-    
-    # Get translation prompt
-    try:
-        system_prompt = get_translation_prompt(source_lang, target_lang)
-        user_content = text
-        logger.debug(f"Using translation prompt for {source_lang}-{target_lang}")
-    except Exception as e:
-        logger.error(f"Error getting translation prompt: {e}")
-        return {"success": False, "error": f"Error getting prompt: {e}"}
-    
-    # Make API call
-    payload = {
-        'model': config['model'],
-        'messages': [
-            {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': user_content}
-        ]
-    }
-    headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {config["api_key"]}'}
-    
-    try:
-        logger.debug(f"Making translation API call to {config['api_url']} with model {config['model']}")
-        response = requests.post(config['api_url'], headers=headers, data=json.dumps(payload), timeout=60)
-        response.raise_for_status()
-        response_data = response.json()
-        
-        if "choices" in response_data and response_data["choices"]:
-            translation = response_data["choices"][0]["message"]["content"]
-            logger.info(f"Translation successful, result length: {len(translation)}")
-            return {"success": True, "translation": translation}
-        else:
-            logger.error(f"Invalid API response: {response_data}")
-            return {"success": False, "error": "Invalid API response"}
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Translation API request failed: {e}")
-        return {"success": False, "error": str(e)}
-    except Exception as e:
-        logger.error(f"Unexpected error during translation: {e}")
-        return {"success": False, "error": str(e)}
-
-def get_evaluation_prompt(source_lang: str, target_lang: str, source_text: str, translation: str) -> str:
-    """Get evaluation prompt for translation quality assessment"""
-    source_lang_name = LANGUAGES.get(source_lang, source_lang)
-    target_lang_name = LANGUAGES.get(target_lang, target_lang)
-    
-    prompt = f"""You are an expert linguistic evaluator. Your task is to assess the quality of a machine translation.
-You will be given a source text and a translation.
-Evaluate the translation based on two criteria:
-1. **Accuracy:** Does the translation faithfully convey the meaning of the source text?
-2. **Fluency:** Is the translation natural and grammatically correct in the target language?
-
-Provide a single score from 1 to 10, where 1 is very poor and 10 is perfect.
-The score should be an integer.
-Also provide a one-sentence justification for your score.
-
-Format your response EXACTLY as follows:
-SCORE: [number]
-JUSTIFICATION: [your justification]
-
-Example Response:
-SCORE: 8
-JUSTIFICATION: The translation is accurate but sounds slightly unnatural in one phrase.
-
----
-
-SOURCE TEXT ({source_lang_name}):
-{source_text}
-
----
-
-TRANSLATION ({target_lang_name}):
-{translation}"""
-    
-    return prompt
-
-def evaluate_translation(source_lang: str, target_lang: str, source_text: str, translation: str) -> dict:
-    """Evaluate translation quality using LLM"""
-    logger.info(f"Starting evaluation: {source_lang} -> {target_lang}")
-    
-    config = get_evaluation_config()
-    if not config['api_key']:
-        logger.error("Evaluation API key not available")
-        return {"success": False, "error": "Evaluation API key not found"}
-    
-    # Get evaluation prompt
-    try:
-        eval_prompt = get_evaluation_prompt(source_lang, target_lang, source_text, translation)
-        logger.debug(f"Using evaluation prompt for {source_lang}-{target_lang}")
-    except Exception as e:
-        logger.error(f"Error getting evaluation prompt: {e}")
-        return {"success": False, "error": f"Error getting evaluation prompt: {e}"}
-    
-    # Make API call
-    payload = {
-        'model': config['model'],
-        'messages': [{'role': 'user', 'content': eval_prompt}]
-    }
-    headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {config["api_key"]}'}
-    
-    try:
-        logger.debug(f"Making evaluation API call to {config['api_url']} with model {config['model']}")
-        response = requests.post(config['api_url'], headers=headers, data=json.dumps(payload), timeout=60)
-        response.raise_for_status()
-        eval_data = response.json()
-        
-        if "choices" in eval_data and eval_data["choices"]:
-            eval_result_str = eval_data["choices"][0]["message"]["content"].strip()
-            
-            # Parse score and justification
-            score = "N/A"
-            justification = "No justification provided."
-            
-            lines = eval_result_str.split('\n')
-            for line in lines:
-                line = line.strip()
-                if line.startswith("SCORE:"):
-                    try:
-                        score = int(line.split("SCORE:")[1].strip())
-                        logger.debug(f"Parsed evaluation score: {score}")
-                    except (ValueError, IndexError):
-                        logger.warning(f"Failed to parse score from line: {line}")
-                        score = "N/A"
-                elif line.startswith("JUSTIFICATION:"):
-                    justification = line.split("JUSTIFICATION:")[1].strip()
-                    logger.debug(f"Parsed justification length: {len(justification)}")
-            
-            logger.info(f"Evaluation successful, score: {score}")
-            return {"success": True, "score": score, "justification": justification}
-        else:
-            logger.error(f"Invalid evaluation response: {eval_data}")
-            return {"success": False, "error": "Invalid evaluation response"}
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Evaluation API request failed: {e}")
-        return {"success": False, "error": str(e)}
-    except Exception as e:
-        logger.error(f"Unexpected error during evaluation: {e}")
-        return {"success": False, "error": str(e)}
 
 @app.route('/')
 def index():
@@ -269,23 +30,47 @@ def index():
 
 @app.route('/api/translate', methods=['POST'])
 def api_translate():
-    """API endpoint for translation"""
+    """API endpoint for translation with enhanced parameter support"""
     data = request.get_json()
-    source_lang = data.get('source_lang')
-    target_lang = data.get('target_lang')
+    source_lang = data.get('source_lang') or 'auto'
+    target_lang = data.get('target_lang') or 'en'
     text = data.get('text', '').strip()
     
-    logger.info(f"Translation API called: {source_lang} -> {target_lang}")
+    # Optional parameters for translation control
+    stream = data.get('stream')  # None means use config default
+    temperature = data.get('temperature')  # None means use config default
+    max_length = data.get('max_length')  # None means use config default
+    top_p = data.get('top_p')  # None means use config default
     
-    if not all([source_lang, target_lang, text]):
-        logger.warning("Missing required parameters in translation request")
-        return jsonify({"success": False, "error": "Missing required parameters"})
+    logger.info(f"Translation API called: {source_lang} -> {target_lang}, stream={stream}, temp={temperature}")
     
-    if source_lang == target_lang:
-        logger.warning("Source and target languages are the same")
-        return jsonify({"success": False, "error": "Source and target languages must be different"})
+    # Auto detect language if needed
+    if source_lang in ['auto', '', None]:
+        source_lang = detect_language(text)
+        logger.info(f"Auto-detected source language: {source_lang}")
     
-    result = translate_text(source_lang, target_lang, text)
+    # Validate required parameters
+    if not text:
+        logger.warning("Missing text in translation request")
+        return jsonify({"success": False, "error": "Text is required"})
+    
+    # Validate language pair
+    is_valid, error_msg = validate_language_pair(source_lang, target_lang)
+    if not is_valid:
+        logger.warning(f"Invalid language pair: {error_msg}")
+        return jsonify({"success": False, "error": error_msg})
+    
+    # Call translation service with parameters
+    result = translation_service.translate_text(
+        source_lang=source_lang,
+        target_lang=target_lang,
+        text=text,
+        stream=stream,
+        temperature=temperature,
+        max_length=max_length,
+        top_p=top_p
+    )
+    
     logger.info(f"Translation API result: success={result['success']}")
     return jsonify(result)
 
@@ -300,11 +85,19 @@ def api_evaluate():
     
     logger.info(f"Evaluation API called: {source_lang} -> {target_lang}")
     
-    if not all([source_lang, target_lang, source_text, translation]):
+    # Validate required parameters
+    if not all([source_text, translation]):
         logger.warning("Missing required parameters in evaluation request")
-        return jsonify({"success": False, "error": "Missing required parameters"})
+        return jsonify({"success": False, "error": "Source text and translation are required"})
     
-    result = evaluate_translation(source_lang, target_lang, source_text, translation)
+    # Validate language pair
+    is_valid, error_msg = validate_language_pair(source_lang, target_lang)
+    if not is_valid:
+        logger.warning(f"Invalid language pair: {error_msg}")
+        return jsonify({"success": False, "error": error_msg})
+    
+    # Call evaluation service
+    result = evaluation_service.evaluate_translation(source_lang, target_lang, source_text, translation)
     logger.info(f"Evaluation API result: success={result['success']}")
     return jsonify(result)
 
@@ -670,9 +463,5 @@ def validate_results():
         })
 
 if __name__ == '__main__':
-    host = os.environ.get('FLASK_HOST', '127.0.0.1')
-    port = int(os.environ.get('FLASK_PORT', 8888))
-    debug = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
-    
-    logger.info(f"Starting Flask app on {host}:{port}, debug={debug}")
-    app.run(debug=debug, port=port, host=host) 
+    logger.info(f"Starting Flask app on {FLASK_CONFIG['host']}:{FLASK_CONFIG['port']}, debug={FLASK_CONFIG['debug']}")
+    app.run(debug=FLASK_CONFIG['debug'], port=FLASK_CONFIG['port'], host=FLASK_CONFIG['host']) 
