@@ -21,12 +21,15 @@ os.chdir(project_root)
 from backend.app import app
 
 if __name__ == '__main__':
+    # Get port from environment variable, default to 8888
+    port = int(os.environ.get('FLASK_PORT', 8888))
+    
     print("🚀 启动翻译评估工具...")
-    print("访问地址: http://127.0.0.1:8888")
+    print(f"访问地址: http://127.0.0.1:{port}")
     print("按 Ctrl+C 停止服务")
     print("-" * 50)
     
     # Set Flask app environment
     os.environ['FLASK_APP'] = str(backend_dir / 'app.py')
     
-    app.run(debug=True, port=8888, host='127.0.0.1') 
+    app.run(debug=True, port=port, host='127.0.0.1') 

@@ -1,164 +1,240 @@
-# Translation Evaluation Tool
+# 翻译评估工具 (Translation Evaluation Tool)
 
-一个基于AI的翻译质量评估工具，支持多语言翻译和自动化质量评估。
+一个功能完整的多语言翻译评估平台，支持实时翻译、智能评估、语音合成和批量处理。
 
-## 🌟 特性
+## ✨ 主要功能
 
-- **多语言支持**: 支持英语、中文、日语、葡萄牙语、西班牙语之间的互译（20个翻译方向）
-- **AI驱动评估**: 使用大语言模型进行翻译质量评估，提供1-10分评分和详细反馈
-- **批量处理**: 支持批量翻译和评估，提高工作效率
-- **现代化界面**: 美观的Web界面，支持实时批量操作和结果可视化
-- **完整API**: RESTful API接口，支持程序化调用
+### 🌐 多语言翻译
+- **支持语言**: 中文、英文、日文、葡萄牙语、西班牙语
+- **自动检测**: 智能识别源语言
+- **实时翻译**: 基于DeepSeek API的高质量翻译
+- **批量处理**: 支持10并发的批量翻译
+
+### 📊 智能评估系统
+- **多维度评估**: 语义准确度、BLEU分数、流畅度、综合评分
+- **实时评分**: 1-10分评分制，提供详细评估理由
+- **统计分析**: 平均分数、流畅度率等统计指标
+- **历史追踪**: 完整的翻译和评估历史记录
+
+### 🎵 语音合成 (TTS)
+- **MiniMax集成**: 基于MiniMax T2A V2 API
+- **多语言支持**: 针对不同语言优化的声音选择
+- **实时播放**: 支持源文本和翻译结果的语音播放
+- **智能优化**: 自动处理文本长度和编码问题
+
+### 🎮 交互式界面
+- **翻译游乐场**: 现代化的Web界面，支持文件上传
+- **拖拽上传**: 支持.txt文件的拖拽式上传
+- **响应式设计**: 完美适配桌面和移动设备
+- **实时图表**: 使用Chart.js展示评估统计
 
 ## 🚀 快速开始
 
-### 1. 安装和配置
+### 环境要求
+- Python 3.8+
+- pip (Python包管理器)
 
+### 安装步骤
+
+1. **克隆项目**
 ```bash
-# 安装依赖
-pip install -r requirements.txt
-
-# 配置API密钥
-cp .env.example .env
-# 编辑 .env 文件，添加你的API密钥
+git clone 
+cd translate_eval
 ```
 
-### 2. 启动应用
+2. **创建虚拟环境**
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或 venv\Scripts\activate  # Windows
+```
 
+3. **安装依赖**
+```bash
+pip install -r requirements.txt
+```
+
+4. **配置环境变量**
+创建 `.env` 文件或设置环境变量：
+```bash
+# DeepSeek API (必需)
+DEEPSEEK_API_KEY=your_deepseek_api_key
+
+# MiniMax TTS API (可选，用于语音功能)
+MINIMAX_API_KEY=your_minimax_api_key
+MINIMAX_GROUP_ID=your_minimax_group_id
+
+# 自定义端口 (可选，默认8888)
+FLASK_PORT=8889
+```
+
+5. **启动应用**
 ```bash
 python run_app.py
 ```
 
-### 3. 访问应用
+6. **访问应用**
+打开浏览器访问: http://127.0.0.1:8888
 
-- **主界面**: http://localhost:8888 - 单次翻译和评估
-- **批量仪表板**: http://localhost:8888/batch - 批量操作和结果分析
+## 📖 使用指南
+
+### 基础翻译
+1. 在源文本框输入要翻译的文本
+2. 选择源语言和目标语言（支持自动检测）
+3. 点击"翻译"按钮
+4. 查看翻译结果和评估分数
+
+### 语音功能
+1. 完成翻译后，点击播放按钮 🔊
+2. 支持播放源文本和翻译结果
+3. 自动选择适合的语音模型
+
+### 文件上传
+1. 拖拽.txt文件到上传区域
+2. 或点击上传区域选择文件
+3. 系统自动读取文件内容到文本框
+
+### 批量处理
+1. 访问 `/batch` 页面
+2. 选择语言对和示例文本
+3. 点击"翻译 & 评估"进行批量处理
+4. 查看统计图表和历史记录
+
+## 🛠️ API接口
+
+### 翻译接口
+```bash
+POST /api/translate
+Content-Type: application/json
+
+{
+    "source_lang": "zh",
+    "target_lang": "en", 
+    "text": "你好世界"
+}
+```
+
+### 评估接口
+```bash
+POST /api/evaluate
+Content-Type: application/json
+
+{
+    "source_lang": "zh",
+    "target_lang": "en",
+    "source_text": "你好世界",
+    "translation": "Hello world"
+}
+```
+
+### 语音合成接口
+```bash
+POST /api/tts
+Content-Type: application/json
+
+{
+    "text": "Hello world",
+    "language": "en"
+}
+```
+
+### 历史记录接口
+```bash
+GET /api/history
+```
+
+更多API文档请参考 [API_DOCS.md](API_DOCS.md)
+
+## 🧪 测试
+
+### 运行所有测试
+```bash
+python scripts/run_tests.py
+```
+
+### 运行特定测试
+```bash
+# 只运行TTS测试
+python scripts/run_tests.py --tts-only
+
+# 只运行编码测试
+python scripts/run_tests.py --encoding-only
+```
 
 ## 📁 项目结构
 
 ```
 translate_eval/
-├── backend/                 # Flask后端应用
-│   ├── app.py              # 主应用文件（包含所有API端点和提示词）
-│   ├── templates/          # HTML模板
-│   └── static/             # 静态资源（CSS、JS）
-├── data/                   # 数据存储
-│   ├── translations/       # 翻译结果（按时间戳组织）
-│   ├── evaluations/        # 评估结果（按时间戳组织）
-│   └── testcases/          # 测试用例（各语言）
-├── scripts/                # 工具脚本
-│   ├── translate_single.py # 单次翻译脚本
-│   ├── evaluate_single.py  # 单次评估脚本
-│   └── batch_operations.py # 批量操作脚本
-├── evaluation/             # 评估模块
-│   └── eval.py            # 核心评估逻辑
-├── API_DOCS.md            # 完整API文档
-└── run_app.py             # 应用启动入口
+├── backend/                    # 后端服务
+│   ├── app.py                 # Flask主应用
+│   ├── batch.py               # 批量处理
+│   ├── config.py              # 配置管理
+│   ├── services.py            # 翻译/评估服务
+│   ├── tts_service.py         # TTS语音服务
+│   ├── utils.py               # 工具函数
+│   ├── examples.py            # 示例数据
+│   ├── templates/             # HTML模板
+│   └── static/                # 静态资源
+├── scripts/                   # 脚本工具
+│   └── run_tests.py          # 测试运行器
+├── tests/                     # 测试套件
+│   └── test_tts_service.py   # TTS服务测试
+├── data/                      # 数据存储
+│   ├── translations/         # 翻译结果
+│   ├── evaluations/          # 评估结果
+│   └── testcases/            # 测试用例
+├── evaluation/               # 评估模块
+│   └── eval.py              # 独立评估脚本
+└── run_app.py               # 应用启动器
 ```
 
-## 💻 使用方法
+## ⚙️ 配置说明
 
-### Web界面操作
+### DeepSeek API配置
+1. 访问 [DeepSeek平台](https://platform.deepseek.com/)
+2. 获取API密钥
+3. 设置环境变量 `DEEPSEEK_API_KEY`
 
-1. **单次翻译**: 访问主界面，输入文本进行翻译和评估
-2. **批量操作**: 访问批量仪表板，选择语言对后点击"Translate"或"Evaluate"按钮
-3. **查看结果**: 在批量仪表板中查看评估统计和详细结果
+### MiniMax TTS配置（可选）
+1. 访问 [MiniMax平台](https://www.minimax.chat/)
+2. 获取API密钥和Group ID
+3. 设置环境变量：
+   - `MINIMAX_API_KEY`
+   - `MINIMAX_GROUP_ID`
 
-### 命令行操作
-
+### 端口配置
+默认端口为8888，可通过环境变量修改：
 ```bash
-# 翻译
-python scripts/translate_single.py en zh --lines 5
-
-# 评估（使用上一步的运行ID）
-python scripts/evaluate_single.py en zh 20241226_1400
-
-# 批量操作
-python scripts/batch_operations.py translate-all
-python scripts/batch_operations.py evaluate-all --translation-run-id 20241226_1400
+FLASK_PORT=8889 python run_app.py
 ```
 
-## 🔧 API使用
+## 🔧 故障排除
 
-详细的API文档请查看 [API_DOCS.md](API_DOCS.md)
+### 常见问题
 
-### 基本API调用示例
+1. **TTS无法播放**
+   - 确保MiniMax API配置正确
+   - 检查浏览器是否支持音频播放
+   - 查看浏览器控制台错误信息
 
-```python
-import requests
+2. **翻译失败**
+   - 检查DeepSeek API密钥是否有效
+   - 确认网络连接正常
+   - 查看日志文件获取详细错误
 
-# 翻译
-response = requests.post('http://localhost:8888/api/translate', json={
-    'source_lang': 'en',
-    'target_lang': 'zh', 
-    'text': 'Hello world'
-})
+### 日志查看
+日志文件位于 `logs/` 目录下，包含详细的错误信息和调试信息。
 
-# 评估
-response = requests.post('http://localhost:8888/api/evaluate', json={
-    'source_lang': 'en',
-    'target_lang': 'zh',
-    'source_text': 'Hello world',
-    'translation': '你好世界'
-})
-```
+## 🤝 贡献
 
-## ⚙️ 配置
-
-在 `.env` 文件中配置API密钥：
-
-```env
-# 翻译API配置
-TRANSLATION_API_KEY=your_api_key
-TRANSLATION_API_URL=https://api.openai.com/v1/chat/completions
-TRANSLATION_MODEL=gpt-4
-
-# 评估API配置
-EVALUATION_API_KEY=your_api_key
-EVALUATION_API_URL=https://api.openai.com/v1/chat/completions
-EVALUATION_MODEL=gpt-4
-
-# 服务器配置
-FLASK_HOST=127.0.0.1
-FLASK_PORT=8888
-FLASK_DEBUG=True
-```
-
-## 📊 支持的语言
-
-| 代码 | 语言 | 原生名称 |
-|------|------|----------|
-| `en` | English | English |
-| `zh` | Chinese | 中文 |
-| `ja` | Japanese | 日本語 |
-| `pt` | Portuguese | Português |
-| `es` | Spanish | Español |
-
-## 🎯 评分标准
-
-- **1-3分**: 差（意思错误或不流畅）
-- **4-6分**: 一般（有错误但可理解）
-- **7-8分**: 好（轻微错误，基本准确）
-- **9-10分**: 优秀（接近完美或完美翻译）
-
-## 📝 数据组织
-
-结果按时间戳组织，格式为 `YYYYMMDD_HHMM`：
-
-```
-data/
-├── translations/20241226_1500/en-zh/line_1_translation.json
-├── evaluations/20241226_1500/en-zh/line_1_evaluation.json
-└── testcases/en/test_suite.txt
-```
-
-## 🔍 故障排除
-
-1. **API密钥错误**: 检查 `.env` 文件中的API密钥配置
-2. **端口占用**: 修改 `.env` 中的 `FLASK_PORT` 设置
-3. **依赖问题**: 运行 `pip install -r requirements.txt` 重新安装依赖
-4. **网络问题**: 确保API端点可访问
+欢迎提交Issue和Pull Request来改进这个项目！
 
 ## 📄 许可证
 
-MIT License
+本项目采用MIT许可证，详见 [LICENSE](LICENSE) 文件。
+
+## 🔗 相关链接
+
+- [API接口文档](API_DOCS.md)
+- [DeepSeek API文档](https://platform.deepseek.com/api-docs/)
+- [MiniMax TTS文档](https://www.minimax.chat/document/guides/T2A)

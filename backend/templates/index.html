@@ -100,20 +100,28 @@
                                     <label for="source-text" class="form-label">Source Text</label>
                                     <textarea class="form-control" id="source-text" rows="8" 
                                               placeholder="Enter text to translate..."></textarea>
-                                    <div class="mt-2">
+                                    <div class="mt-2 d-flex justify-content-between align-items-center">
                                         <small class="text-muted">Characters: <span id="char-count">0</span></small>
+                                        <button class="btn btn-outline-info btn-sm" id="play-source-btn" title="Play Source Text" disabled>
+                                            <i class="fas fa-play me-1"></i>Play
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="translation-text" class="form-label">Translation</label>
                                     <textarea class="form-control" id="translation-text" rows="8" 
                                               placeholder="Translation will appear here..." readonly></textarea>
-                                    <div class="mt-2">
-                                        <button class="btn btn-primary" id="translate-btn">
-                                            <i class="fas fa-language me-1"></i>Translate
-                                        </button>
-                                        <button class="btn btn-outline-secondary ms-2" id="clear-btn">
-                                            <i class="fas fa-trash me-1"></i>Clear
+                                    <div class="mt-2 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <button class="btn btn-primary" id="translate-btn">
+                                                <i class="fas fa-language me-1"></i>Translate
+                                            </button>
+                                            <button class="btn btn-outline-secondary ms-2" id="clear-btn">
+                                                <i class="fas fa-trash me-1"></i>Clear
+                                            </button>
+                                        </div>
+                                        <button class="btn btn-outline-info btn-sm" id="play-translation-btn" title="Play Translation" disabled>
+                                            <i class="fas fa-play me-1"></i>Play
                                         </button>
                                     </div>
                                 </div>

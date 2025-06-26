@@ -13,6 +13,7 @@ from utils import setup_logging, format_run_id, validate_language_pair, detect_l
 from services import TranslationService, EvaluationService
 from batch import run_batch_translation, run_batch_evaluation, run_live_translation_and_evaluation
 from examples import EXAMPLES
+from tts_service import TTSService
 
 # Initialize logging
 logger = setup_logging()
@@ -22,6 +23,7 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 # Initialize services
 translation_service = TranslationService()
 evaluation_service = EvaluationService()
+tts_service = TTSService()
 
 
 
@@ -209,6 +211,47 @@ def api_history():
     except Exception as e:
         logger.error(f"Error getting history: {e}")
         return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/tts', methods=['POST'])
+def api_text_to_speech():
+    """Text-to-Speech API endpoint using MiniMax"""
+    data = request.get_json()
+    text = data.get('text', '').strip()
+    language = data.get('language', 'zh')
+    
+    logger.info(f"TTS API called: language={language}, text_length={len(text)}")
+    
+    # Validate required parameters
+    if not text:
+        logger.warning("Missing text in TTS request")
+        return jsonify({"success": False, "error": "Text is required"})
+    
+    # Validate language
+    if language not in ['en', 'zh', 'ja', 'pt', 'es']:
+        logger.warning(f"Unsupported language for TTS: {language}")
+        return jsonify({"success": False, "error": f"Unsupported language: {language}"})
+    
+    # Call TTS service
+    result = tts_service.text_to_speech(text, language)
+    logger.info(f"TTS API result: success={result['success']}")
+    
+    if result['success']:
+        # Return audio data as base64
+        return jsonify({
+            "success": True,
+            "audio_data": result['audio_data'],
+            "format": result['format'],
+            "voice_id": result['voice_id']
+        })
+    else:
+        return jsonify({"success": False, "error": result['error']})
+
+@app.route('/api/tts/voices', methods=['GET'])
+def api_get_tts_voices():
+    """Get available TTS voices"""
+    language = request.args.get('language')
+    result = tts_service.get_supported_voices(language)
+    return jsonify(result)
 
 @app.route('/api/playground-run', methods=['POST'])
 def api_playground_run():

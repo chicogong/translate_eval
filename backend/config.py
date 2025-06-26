@@ -44,6 +44,31 @@ def get_evaluation_config():
         'model': os.environ.get('EVALUATION_MODEL')
     }
 
+# MiniMax TTS configuration
+def get_tts_config():
+    """获取MiniMax TTS API配置"""
+    return {
+        'api_key': os.environ.get('MINIMAX_API_KEY'),
+        'group_id': os.environ.get('MINIMAX_GROUP_ID'),
+        'api_url': 'https://api.minimax.chat/v1/t2a_v2',
+        'model': 'speech-01-turbo',
+        'voice_setting': {
+            'voice_id': 'male-qn-qingse',  # 默认声音
+            'speed': 1.0,
+            'vol': 1.0,
+            'pitch': 0
+        }
+    }
+
+# Language to voice mapping for MiniMax TTS
+TTS_VOICE_MAPPING = {
+    'en': 'female-shaonv',  # 英文女声
+    'zh': 'male-qn-qingse',  # 中文男声
+    'ja': 'female-yujie',   # 日文女声
+    'pt': 'female-shaonv',  # 葡萄牙语使用英文声音
+    'es': 'female-shaonv'   # 西班牙语使用英文声音
+}
+
 # Flask configuration
 FLASK_CONFIG = {
     'host': os.environ.get('FLASK_HOST', '127.0.0.1'),

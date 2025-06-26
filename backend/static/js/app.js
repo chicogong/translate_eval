@@ -41,6 +41,13 @@ class TranslationApp {
 
         // Example buttons
         this.exampleButtons = document.querySelectorAll('.example-btn');
+
+        // TTS buttons
+        this.playSourceBtn = document.getElementById('play-source-btn');
+        this.playTranslationBtn = document.getElementById('play-translation-btn');
+        
+        // Audio element for playback
+        this.audioPlayer = new Audio();
     }
 
     bindEvents() {
@@ -82,6 +89,10 @@ class TranslationApp {
                 this.translateText();
             }
         });
+
+        // TTS button events
+        this.playSourceBtn.addEventListener('click', () => this.playText('source'));
+        this.playTranslationBtn.addEventListener('click', () => this.playText('translation'));
     }
 
     swapLanguages() {
@@ -114,6 +125,9 @@ class TranslationApp {
         } else {
             this.charCount.style.color = '#6c757d';
         }
+        
+        // Enable/disable source TTS button
+        this.playSourceBtn.disabled = !this.sourceText.value.trim();
     }
 
     async translateText() {
@@ -172,6 +186,9 @@ class TranslationApp {
                 this.translationText.value = result.translation;
                 this.showEvaluationSection();
                 this.showAlert('Translation completed successfully!', 'success');
+                
+                // Enable translation TTS button
+                this.playTranslationBtn.disabled = false;
             } else {
                 this.showAlert(`Translation failed: ${result.error}`, 'danger');
             }
@@ -279,6 +296,14 @@ class TranslationApp {
         this.translationText.value = '';
         this.updateCharCount();
         this.resetEvaluation();
+        
+        // Disable TTS buttons
+        this.playSourceBtn.disabled = true;
+        this.playTranslationBtn.disabled = true;
+        
+        // Stop any playing audio
+        this.audioPlayer.pause();
+        this.audioPlayer.currentTime = 0;
     }
 
     showLoading() {
@@ -312,6 +337,136 @@ class TranslationApp {
                 alertDiv.remove();
             }
         }, 5000);
+    }
+
+    async playText(type) {
+        let text, language, button;
+        
+        if (type === 'source') {
+            text = this.sourceText.value.trim();
+            language = this.sourceLangSelect.value;
+            button = this.playSourceBtn;
+        } else {
+            text = this.translationText.value.trim();
+            language = this.targetLangSelect.value;
+            button = this.playTranslationBtn;
+        }
+
+        if (!text) {
+            this.showAlert('No text to play', 'warning');
+            return;
+        }
+
+        // Limit text length for TTS
+        if (text.length > 500) {
+            text = text.substring(0, 500) + '...';
+            this.showAlert('Text truncated to 500 characters for speech synthesis', 'info');
+        }
+
+        // Update button state
+        const originalHTML = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Loading...';
+
+        try {
+            const response = await fetch('/api/tts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    language: language
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Convert base64 to blob and play
+                const audioData = result.audio_data;
+                const audioBlob = this.base64ToBlob(audioData, 'audio/mp3');
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                // Stop any currently playing audio
+                this.audioPlayer.pause();
+                this.audioPlayer.currentTime = 0;
+                
+                // Play new audio
+                this.audioPlayer.src = audioUrl;
+                
+                // Update button to show stop functionality
+                button.innerHTML = '<i class="fas fa-stop me-1"></i>Stop';
+                button.disabled = false;
+                
+                // Handle audio events
+                this.audioPlayer.onended = () => {
+                    button.innerHTML = originalHTML;
+                    URL.revokeObjectURL(audioUrl);
+                };
+                
+                this.audioPlayer.onerror = () => {
+                    this.showAlert('Error playing audio', 'danger');
+                    button.innerHTML = originalHTML;
+                    button.disabled = false;
+                    URL.revokeObjectURL(audioUrl);
+                };
+                
+                // Play audio
+                await this.audioPlayer.play();
+                
+                // Update button click handler temporarily
+                const stopHandler = () => {
+                    this.audioPlayer.pause();
+                    this.audioPlayer.currentTime = 0;
+                    button.innerHTML = originalHTML;
+                    button.removeEventListener('click', stopHandler);
+                    URL.revokeObjectURL(audioUrl);
+                };
+                button.addEventListener('click', stopHandler, { once: true });
+                
+            } else {
+                this.showAlert(`Text-to-speech failed: ${result.error}`, 'danger');
+            }
+        } catch (error) {
+            this.showAlert(`TTS error: ${error.message}`, 'danger');
+        } finally {
+            if (button.innerHTML.includes('Loading')) {
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }
+        }
+    }
+
+    base64ToBlob(audioData, mimeType) {
+        try {
+            // Check if the data is hex string (from MiniMax API)
+            if (audioData.match(/^[0-9a-fA-F]+$/)) {
+                // Convert hex string to byte array
+                const byteNumbers = new Array(audioData.length / 2);
+                for (let i = 0; i < audioData.length; i += 2) {
+                    byteNumbers[i / 2] = parseInt(audioData.substr(i, 2), 16);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                return new Blob([byteArray], { type: mimeType });
+            } else {
+                // Handle base64 string
+                // Remove data URL prefix if present
+                const base64 = audioData.replace(/^data:audio\/[^;]+;base64,/, '');
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                
+                const byteArray = new Uint8Array(byteNumbers);
+                return new Blob([byteArray], { type: mimeType });
+            }
+        } catch (error) {
+            console.error('Error converting audio data:', error);
+            throw new Error('Failed to convert audio data');
+        }
     }
 }
 
