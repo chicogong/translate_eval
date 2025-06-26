@@ -343,6 +343,283 @@ def api_results():
     summary = summarize_results(results)
     return jsonify({"success": True, "version": version, **summary, "results": results})
 
+@app.route('/api/available-runs')
+def api_available_runs():
+    """Get available translation and evaluation runs"""
+    try:
+        translation_runs = []
+        evaluation_runs = []
+        
+        # Get translation runs
+        translations_dir = Path('data/translations')
+        if translations_dir.exists():
+            for run_dir in translations_dir.iterdir():
+                if run_dir.is_dir():
+                    translation_runs.append(run_dir.name)
+        
+        # Get evaluation runs
+        evaluations_dir = Path('data/evaluations')
+        if evaluations_dir.exists():
+            for run_dir in evaluations_dir.iterdir():
+                if run_dir.is_dir():
+                    evaluation_runs.append(run_dir.name)
+        
+        # Sort by date (newest first)
+        translation_runs.sort(reverse=True)
+        evaluation_runs.sort(reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'translation_runs': translation_runs,
+            'evaluation_runs': evaluation_runs
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error getting available runs: {str(e)}'
+        })
+
+@app.route('/api/evaluation-results')
+def api_evaluation_results():
+    """Get evaluation results for a specific run and language pair"""
+    try:
+        eval_run_id = request.args.get('eval_run_id')
+        source_lang = request.args.get('source_lang')
+        target_lang = request.args.get('target_lang')
+        
+        if not all([eval_run_id, source_lang, target_lang]):
+            return jsonify({
+                'success': False,
+                'error': 'eval_run_id, source_lang, and target_lang are required'
+            })
+        
+        if source_lang == target_lang:
+            return jsonify({
+                'success': False,
+                'error': 'source_lang and target_lang must be different'
+            })
+        
+        # Load evaluation results
+        evaluations_dir = Path(f'data/evaluations/{eval_run_id}/{source_lang}-{target_lang}')
+        if not evaluations_dir.exists():
+            return jsonify({
+                'success': False,
+                'error': f'No evaluation results found for {source_lang}-{target_lang} run {eval_run_id}'
+            })
+        
+        results = []
+        for json_file in evaluations_dir.glob('*.json'):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    results.append(data)
+            except Exception as e:
+                logger.warning(f"Failed to load {json_file}: {e}")
+        
+        # Sort by line number
+        results.sort(key=lambda x: x.get('line_number', 0))
+        
+        # Calculate summary
+        summary = summarize_results(results)
+        
+        return jsonify({
+            'success': True,
+            'eval_run_id': eval_run_id,
+            'results': results,
+            **summary
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error loading evaluation results: {str(e)}'
+        })
+
+@app.route('/api/batch-translate', methods=['POST'])
+def api_batch_translate():
+    """Start batch translation process"""
+    try:
+        data = request.get_json()
+        source_lang = data.get('source_lang')
+        target_lang = data.get('target_lang')
+        lines = data.get('lines', 15)
+        
+        if not all([source_lang, target_lang]):
+            return jsonify({
+                'success': False,
+                'error': 'source_lang and target_lang are required'
+            })
+        
+        if source_lang == target_lang:
+            return jsonify({
+                'success': False,
+                'error': 'source_lang and target_lang must be different'
+            })
+        
+        # Generate run ID
+        from datetime import datetime
+        run_id = datetime.now().strftime("%Y%m%d_%H%M")
+        
+        # Import and run translation script
+        import subprocess
+        import sys
+        
+        cmd = [
+            sys.executable, 'scripts/translate_single.py',
+            source_lang, target_lang,
+            '--run-id', run_id,
+            '--lines', str(lines)
+        ]
+        
+        # Run in background
+        process = subprocess.Popen(cmd, cwd=PROJECT_ROOT)
+        
+        return jsonify({
+            'success': True,
+            'run_id': run_id,
+            'message': f'Batch translation started for {source_lang}-{target_lang}',
+            'processed': lines
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error starting batch translation: {str(e)}'
+        })
+
+@app.route('/api/batch-evaluate', methods=['POST'])
+def api_batch_evaluate():
+    """Start batch evaluation process"""
+    try:
+        data = request.get_json()
+        source_lang = data.get('source_lang')
+        target_lang = data.get('target_lang')
+        translation_run_id = data.get('translation_run_id')
+        
+        if not all([source_lang, target_lang, translation_run_id]):
+            return jsonify({
+                'success': False,
+                'error': 'source_lang, target_lang, and translation_run_id are required'
+            })
+        
+        if source_lang == target_lang:
+            return jsonify({
+                'success': False,
+                'error': 'source_lang and target_lang must be different'
+            })
+        
+        # Generate evaluation run ID
+        from datetime import datetime
+        eval_run_id = datetime.now().strftime("%Y%m%d_%H%M")
+        
+        # Import and run evaluation script
+        import subprocess
+        import sys
+        
+        cmd = [
+            sys.executable, 'scripts/evaluate_single.py',
+            source_lang, target_lang, translation_run_id,
+            '--eval-run-id', eval_run_id
+        ]
+        
+        # Run in background
+        process = subprocess.Popen(cmd, cwd=PROJECT_ROOT)
+        
+        return jsonify({
+            'success': True,
+            'eval_run_id': eval_run_id,
+            'translation_run_id': translation_run_id,
+            'message': f'Batch evaluation started for {source_lang}-{target_lang}',
+            'processed': 15  # Assuming all test cases
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error starting batch evaluation: {str(e)}'
+        })
+
+@app.route('/api/validate-results')
+def validate_results():
+    """Validate result files before displaying"""
+    try:
+        version = request.args.get('version', 'v2')
+        source_lang = request.args.get('source_lang')
+        target_lang = request.args.get('target_lang')
+        
+        if not source_lang or not target_lang:
+            return jsonify({
+                'success': False,
+                'error': 'Missing source_lang or target_lang parameter'
+            })
+        
+        # Check if results directory exists
+        results_dir = Path(f'data/results/{version}/{source_lang}-{target_lang}')
+        if not results_dir.exists():
+            return jsonify({
+                'success': False,
+                'error': f'No results found for {source_lang}-{target_lang} version {version}'
+            })
+        
+        # Check JSON files
+        json_files = list(results_dir.glob('*.json'))
+        if not json_files:
+            return jsonify({
+                'success': False,
+                'error': f'No result files found in {results_dir}'
+            })
+        
+        # Validate file formats
+        valid_files = 0
+        invalid_files = []
+        total_results = 0
+        
+        required_fields = ['source_lang', 'target_lang', 'line_number', 
+                         'source_text', 'translation', 'score', 'justification']
+        
+        for json_file in json_files:
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                if all(field in data for field in required_fields):
+                    valid_files += 1
+                    total_results += 1
+                else:
+                    invalid_files.append({
+                        'file': json_file.name,
+                        'error': 'Missing required fields'
+                    })
+                    
+            except json.JSONDecodeError:
+                invalid_files.append({
+                    'file': json_file.name,
+                    'error': 'Invalid JSON format'
+                })
+            except Exception as e:
+                invalid_files.append({
+                    'file': json_file.name,
+                    'error': str(e)
+                })
+        
+        return jsonify({
+            'success': True,
+            'validation': {
+                'total_files': len(json_files),
+                'valid_files': valid_files,
+                'invalid_files': len(invalid_files),
+                'total_results': total_results,
+                'errors': invalid_files[:5]  # Show first 5 errors
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Validation error: {str(e)}'
+        })
+
 if __name__ == '__main__':
     host = os.environ.get('FLASK_HOST', '127.0.0.1')
     port = int(os.environ.get('FLASK_PORT', 8888))

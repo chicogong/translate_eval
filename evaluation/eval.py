@@ -139,6 +139,104 @@ def save_result(source_lang: str, target_lang: str, line_num: int,
     
     logger.debug(f"Saved result to {result_file}")
 
+def save_translation_result(source_lang: str, target_lang: str, line_number: int, 
+                          source_text: str, translation: str, run_id: str):
+    """Save translation result to file"""
+    translations_dir = PROJECT_ROOT / f"data/translations/{run_id}/{source_lang}-{target_lang}"
+    translations_dir.mkdir(parents=True, exist_ok=True)
+    
+    result_file = translations_dir / f"line_{line_number}_translation.json"
+    
+    translation_data = {
+        "source_lang": source_lang,
+        "target_lang": target_lang,
+        "line_number": line_number,
+        "source_text": source_text,
+        "translation": translation,
+        "run_id": run_id,
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    with open(result_file, 'w', encoding='utf-8') as f:
+        json.dump(translation_data, f, ensure_ascii=False, indent=2)
+    
+    logger.debug(f"Translation saved to {result_file}")
+
+def save_evaluation_result(source_lang: str, target_lang: str, line_number: int, 
+                         source_text: str, translation: str, score: int, 
+                         justification: str, eval_run_id: str):
+    """Save evaluation result to file"""
+    evaluations_dir = PROJECT_ROOT / f"data/evaluations/{eval_run_id}/{source_lang}-{target_lang}"
+    evaluations_dir.mkdir(parents=True, exist_ok=True)
+    
+    result_file = evaluations_dir / f"line_{line_number}_evaluation.json"
+    
+    evaluation_data = {
+        "source_lang": source_lang,
+        "target_lang": target_lang,
+        "line_number": line_number,
+        "source_text": source_text,
+        "translation": translation,
+        "evaluation_score": score,
+        "justification": justification,
+        "eval_run_id": eval_run_id,
+        "timestamp": datetime.now().isoformat(),
+        "bleu_score": None  # Can be calculated later if needed
+    }
+    
+    with open(result_file, 'w', encoding='utf-8') as f:
+        json.dump(evaluation_data, f, ensure_ascii=False, indent=2)
+    
+    logger.debug(f"Evaluation saved to {result_file}")
+
+def load_translation_results(source_lang: str, target_lang: str, run_id: str) -> list:
+    """Load translation results from a specific run"""
+    translations_dir = PROJECT_ROOT / f"data/translations/{run_id}/{source_lang}-{target_lang}"
+    
+    if not translations_dir.exists():
+        logger.warning(f"Translation directory not found: {translations_dir}")
+        return []
+    
+    results = []
+    json_files = sorted(translations_dir.glob("*.json"))
+    
+    for json_file in json_files:
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                results.append(data)
+        except Exception as e:
+            logger.warning(f"Failed to load translation result {json_file}: {e}")
+    
+    # Sort by line number
+    results.sort(key=lambda x: x.get('line_number', 0))
+    logger.info(f"Loaded {len(results)} translation results from {translations_dir}")
+    return results
+
+def load_evaluation_results(source_lang: str, target_lang: str, eval_run_id: str) -> list:
+    """Load evaluation results from a specific run"""
+    evaluations_dir = PROJECT_ROOT / f"data/evaluations/{eval_run_id}/{source_lang}-{target_lang}"
+    
+    if not evaluations_dir.exists():
+        logger.warning(f"Evaluation directory not found: {evaluations_dir}")
+        return []
+    
+    results = []
+    json_files = sorted(evaluations_dir.glob("*.json"))
+    
+    for json_file in json_files:
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                results.append(data)
+        except Exception as e:
+            logger.warning(f"Failed to load evaluation result {json_file}: {e}")
+    
+    # Sort by line number
+    results.sort(key=lambda x: x.get('line_number', 0))
+    logger.info(f"Loaded {len(results)} evaluation results from {evaluations_dir}")
+    return results
+
 def load_evaluator_prompt() -> str:
     """Load the evaluator prompt template"""
     eval_prompt_path = PROJECT_ROOT / "evaluation/prompts/evaluator-prompt.txt"

@@ -6,20 +6,88 @@
     <title>Batch Evaluation Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .score-badge {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .action-card {
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        }
+        .btn-gradient {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        .table-container {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border: none;
+            border-radius: 20px;
+        }
+        .batch-action-card {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        .batch-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .progress-bar-custom {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 8px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-light bg-light mb-4">
+    <nav class="navbar gradient-bg mb-4">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand text-white" href="/">
                 <i class="fas fa-language me-2"></i>Translation Evaluation Tool
             </a>
-            <a class="btn btn-outline-primary" href="/">↩ Back to Translator</a>
+            <a class="btn btn-light" href="/">
+                <i class="fas fa-arrow-left me-1"></i>Back to Translator
+            </a>
         </div>
     </nav>
 
     <div class="container">
         <div class="row mb-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="source-lang" class="form-label">Source Language</label>
                 <select id="source-lang" class="form-select">
                     {% for code, name in languages.items() %}
@@ -27,53 +95,181 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="target-lang" class="form-label">Target Language</label>
                 <select id="target-lang" class="form-select">
                     {% for code, name in languages.items() %}
-                    <option value="{{ code }}">{{ name }}</option>
+                    <option value="{{ code }}" {% if code == 'zh' %}selected{% endif %}>{{ name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button id="load-results" class="btn btn-primary w-100"><i class="fas fa-database me-1"></i>Load Results</button>
-            </div>
-            <div class="col-md-2">
-                <label for="version-select" class="form-label">Version</label>
-                <select id="version-select" class="form-select">
-                    <option value="v1" selected>v1</option>
-                    <option value="v2">v2</option>
+            <div class="col-md-3">
+                <label for="run-select" class="form-label">Evaluation Run</label>
+                <select id="run-select" class="form-select">
+                    <option value="">Loading runs...</option>
                 </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button id="load-results" class="btn btn-gradient w-100">
+                    <i class="fas fa-database me-1"></i>Load Results
+                </button>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card action-card card-hover">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-rocket me-2 text-primary"></i>Quick Actions
+                        </h6>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="loadSampleData()">
+                                <i class="fas fa-eye me-1"></i>View Sample Data
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="loadLatestRun()">
+                                <i class="fas fa-clock me-1"></i>Load Latest Run
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="refreshRuns()">
+                                <i class="fas fa-sync me-1"></i>Refresh Runs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card batch-action-card card-hover">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-cogs me-2 text-success"></i>Batch Operations
+                        </h6>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success btn-sm" onclick="startBatchTranslation()">
+                                <i class="fas fa-language me-1"></i>Batch Translate
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm" onclick="startBatchEvaluation()">
+                                <i class="fas fa-star me-1"></i>Batch Evaluate
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="results-section" style="display:none;">
-            <h4 class="mb-3">Evaluation Results <span id="result-count" class="badge bg-secondary"></span></h4>
-            <div class="mb-3" id="summary-section" style="display:none;">
-                <span class="me-3"><strong>Average Score:</strong> <span id="avg-score" class="text-primary"></span></span>
-                <span><strong>Average BLEU:</strong> <span id="avg-bleu" class="text-primary"></span></span>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="mb-3">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>Evaluation Results 
+                        <span id="result-count" class="badge bg-gradient score-badge"></span>
+                    </h4>
+                </div>
             </div>
-            <canvas id="score-chart" height="120"></canvas>
+            
+            <div class="row mb-4" id="summary-section" style="display:none;">
+                <div class="col-md-4">
+                    <div class="card stats-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-star me-2"></i>Average Score
+                            </h5>
+                            <h2 id="avg-score" class="mb-0">-</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stats-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-line me-2"></i>Average BLEU
+                            </h5>
+                            <h2 id="avg-bleu" class="mb-0">-</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stats-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-list-ol me-2"></i>Total Items
+                            </h5>
+                            <h2 id="total-items" class="mb-0">-</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <canvas id="score-chart" height="120"></canvas>
+                </div>
+            </div>
 
-            <div class="table-responsive mt-4">
-                <table class="table table-striped" id="results-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Line #</th>
-                            <th>Score</th>
-                            <th>BLEU</th>
-                            <th>Source Text</th>
-                            <th>Translation</th>
-                            <th>Justification</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="results-table">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="fas fa-hashtag me-1"></i>Line #</th>
+                                <th><i class="fas fa-star me-1"></i>Score</th>
+                                <th><i class="fas fa-chart-line me-1"></i>BLEU</th>
+                                <th><i class="fas fa-file-text me-1"></i>Source Text</th>
+                                <th><i class="fas fa-language me-1"></i>Translation</th>
+                                <th><i class="fas fa-comment me-1"></i>Justification</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div id="no-data" class="alert alert-info" role="alert">
-            Select a language pair and click "Load Results" to view evaluation data.
+        <div id="no-data" class="card welcome-card">
+            <div class="card-body text-center">
+                <h4 class="card-title">
+                    <i class="fas fa-rocket me-2 text-primary"></i>Welcome to Batch Evaluation Dashboard
+                </h4>
+                <p class="card-text mb-4">
+                    Comprehensive translation quality assessment with AI-powered evaluation and visual analytics.
+                </p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-language fa-3x text-primary mb-2"></i>
+                            <h6>Select Languages</h6>
+                            <small class="text-muted">Choose source and target languages</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-clock fa-3x text-success mb-2"></i>
+                            <h6>Pick Evaluation Run</h6>
+                            <small class="text-muted">Select from available runs</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-chart-bar fa-3x text-warning mb-2"></i>
+                            <h6>View Results</h6>
+                            <small class="text-muted">Analyze evaluation data</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-center gap-3">
+                    <button class="btn btn-gradient" onclick="loadSampleData()">
+                        <i class="fas fa-eye me-1"></i>View Sample Data
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="loadLatestRun()">
+                        <i class="fas fa-clock me-1"></i>Load Latest Run
+                    </button>
+                    <button class="btn btn-outline-success" onclick="startBatchTranslation()">
+                        <i class="fas fa-language me-1"></i>Start Translation
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
