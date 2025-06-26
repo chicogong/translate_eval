@@ -232,12 +232,16 @@ class BatchDashboard {
             else if (res.evaluation_score < 6) scoreClass = 'text-danger';
             
             row.innerHTML = `
-                <td><strong>${res.line_number}</strong></td>
-                <td><span class="badge bg-primary ${scoreClass}">${res.evaluation_score}/10</span></td>
-                <td>${res.bleu_score ? res.bleu_score.toFixed(3) : '-'}</td>
-                <td class="text-truncate" style="max-width: 200px;" title="${this.escapeHtml(res.source_text)}">${this.escapeHtml(res.source_text).slice(0, 80)}...</td>
-                <td class="text-truncate" style="max-width: 200px;" title="${this.escapeHtml(res.translation)}">${this.escapeHtml(res.translation).slice(0, 80)}...</td>
-                <td class="text-truncate" style="max-width: 250px;" title="${this.escapeHtml(res.justification || '')}">${this.escapeHtml(res.justification || '').slice(0,80)}...</td>
+                <td class="text-center"><strong>${res.line_number}</strong></td>
+                <td class="text-center"><span class="score-badge ${this.getScoreClass(res.evaluation_score)}">${res.evaluation_score}/10</span></td>
+                <td class="text-center">${res.bleu_score ? res.bleu_score.toFixed(3) : '-'}</td>
+                <td><div class="text-truncate" style="max-width: 250px;" title="${this.escapeHtml(res.source_text)}">${this.escapeHtml(res.source_text)}</div></td>
+                <td><div class="text-truncate" style="max-width: 250px;" title="${this.escapeHtml(res.translation)}">${this.escapeHtml(res.translation)}</div></td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary" onclick="showDetails('${res.line_number}', '${this.escapeHtml(res.justification || 'No details available')}')" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
             `;
             this.resultsTableBody.appendChild(row);
 
@@ -315,6 +319,12 @@ class BatchDashboard {
         this.loadBtn.innerHTML = isLoading ? 
             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...' : 
             '<i class="fas fa-database me-1"></i>Load Results';
+    }
+
+    getScoreClass(score) {
+        if (score >= 8) return 'score-excellent';
+        if (score >= 6) return 'score-good';
+        return 'score-poor';
     }
 
     escapeHtml(text) {
@@ -490,6 +500,41 @@ function hideProgressModal() {
             bootstrapModal.hide();
         }
     }
+}
+
+function showDetails(lineNumber, justification) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('detailsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'detailsModal';
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-info-circle me-2"></i>Evaluation Details
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Line <span id="detailLineNumber"></span> - Evaluation Justification:</h6>
+                        <div class="alert alert-info">
+                            <p id="detailJustification" class="mb-0"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    document.getElementById('detailLineNumber').textContent = lineNumber;
+    document.getElementById('detailJustification').textContent = justification;
+    
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

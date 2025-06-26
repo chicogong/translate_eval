@@ -86,6 +86,35 @@ def get_evaluation_config():
     logger.debug(f"Evaluation API config loaded: url={config['api_url']}, model={config['model']}")
     return config
 
+def get_translation_prompt(source_lang: str, target_lang: str) -> str:
+    """Get translation prompt for language pair"""
+    # Translation prompts for different language pairs
+    prompts = {
+        "en-zh": "You are an expert English to Chinese translator. Translate the following English text into natural, fluent Chinese. Use Simplified Chinese characters and maintain the technical accuracy of the original text.",
+        "zh-en": "You are an expert Chinese to English translator. Translate the following Chinese text into natural, fluent English. Maintain the technical accuracy and formal tone of the original text.",
+        "en-ja": "You are an expert English to Japanese translator. Translate the following English text into natural, fluent Japanese. Use appropriate formal language and maintain technical accuracy.",
+        "ja-en": "You are an expert Japanese to English translator. Translate the following Japanese text into natural, fluent English. Maintain the technical accuracy and formal tone.",
+        "en-es": "You are an expert English to Spanish translator. Translate the following English text into natural, fluent Spanish. Maintain technical accuracy and use formal language.",
+        "es-en": "You are an expert Spanish to English translator. Translate the following Spanish text into natural, fluent English. Maintain technical accuracy and formal tone.",
+        "en-pt": "You are an expert English to Portuguese translator. Translate the following English text into natural, fluent Portuguese. Maintain technical accuracy and use formal language.",
+        "pt-en": "You are an expert Portuguese to English translator. Translate the following Portuguese text into natural, fluent English. Maintain technical accuracy and formal tone.",
+        "zh-ja": "You are an expert Chinese to Japanese translator. Translate the following Chinese text into natural, fluent Japanese. Use appropriate formal language.",
+        "ja-zh": "You are an expert Japanese to Chinese translator. Translate the following Japanese text into natural, fluent Chinese using Simplified Chinese characters.",
+        "zh-es": "You are an expert Chinese to Spanish translator. Translate the following Chinese text into natural, fluent Spanish. Maintain technical accuracy.",
+        "es-zh": "You are an expert Spanish to Chinese translator. Translate the following Spanish text into natural, fluent Chinese using Simplified Chinese characters.",
+        "zh-pt": "You are an expert Chinese to Portuguese translator. Translate the following Chinese text into natural, fluent Portuguese. Maintain technical accuracy.",
+        "pt-zh": "You are an expert Portuguese to Chinese translator. Translate the following Portuguese text into natural, fluent Chinese using Simplified Chinese characters.",
+        "ja-es": "You are an expert Japanese to Spanish translator. Translate the following Japanese text into natural, fluent Spanish. Maintain technical accuracy.",
+        "es-ja": "You are an expert Spanish to Japanese translator. Translate the following Spanish text into natural, fluent Japanese. Use appropriate formal language.",
+        "ja-pt": "You are an expert Japanese to Portuguese translator. Translate the following Japanese text into natural, fluent Portuguese. Maintain technical accuracy.",
+        "pt-ja": "You are an expert Portuguese to Japanese translator. Translate the following Portuguese text into natural, fluent Japanese. Use appropriate formal language.",
+        "es-pt": "You are an expert Spanish to Portuguese translator. Translate the following Spanish text into natural, fluent Portuguese. Maintain technical accuracy.",
+        "pt-es": "You are an expert Portuguese to Spanish translator. Translate the following Portuguese text into natural, fluent Spanish. Maintain technical accuracy."
+    }
+    
+    lang_pair = f"{source_lang}-{target_lang}"
+    return prompts.get(lang_pair, f"Translate the following text from {source_lang} to {target_lang}.")
+
 def translate_text(source_lang: str, target_lang: str, text: str) -> dict:
     """Translate text using the API"""
     logger.info(f"Starting translation: {source_lang} -> {target_lang}, text length: {len(text)}")
@@ -95,20 +124,14 @@ def translate_text(source_lang: str, target_lang: str, text: str) -> dict:
         logger.error("Translation API key not available")
         return {"success": False, "error": "Translation API key not found"}
     
-    # Load prompt template
-    prompt_file = PROJECT_ROOT / f"evaluation/prompts/{source_lang}-{target_lang}.txt"
-    if not prompt_file.exists():
-        logger.error(f"Prompt file not found: {prompt_file}")
-        return {"success": False, "error": f"Prompt file not found: {prompt_file}"}
-    
+    # Get translation prompt
     try:
-        prompt_template = prompt_file.read_text(encoding="utf-8")
-        system_prompt = prompt_template.split("SOURCE TEXT:")[0].strip()
+        system_prompt = get_translation_prompt(source_lang, target_lang)
         user_content = text
-        logger.debug(f"Loaded prompt template from {prompt_file}")
+        logger.debug(f"Using translation prompt for {source_lang}-{target_lang}")
     except Exception as e:
-        logger.error(f"Error reading prompt file {prompt_file}: {e}")
-        return {"success": False, "error": f"Error reading prompt: {e}"}
+        logger.error(f"Error getting translation prompt: {e}")
+        return {"success": False, "error": f"Error getting prompt: {e}"}
     
     # Make API call
     payload = {
@@ -140,6 +163,41 @@ def translate_text(source_lang: str, target_lang: str, text: str) -> dict:
         logger.error(f"Unexpected error during translation: {e}")
         return {"success": False, "error": str(e)}
 
+def get_evaluation_prompt(source_lang: str, target_lang: str, source_text: str, translation: str) -> str:
+    """Get evaluation prompt for translation quality assessment"""
+    source_lang_name = LANGUAGES.get(source_lang, source_lang)
+    target_lang_name = LANGUAGES.get(target_lang, target_lang)
+    
+    prompt = f"""You are an expert linguistic evaluator. Your task is to assess the quality of a machine translation.
+You will be given a source text and a translation.
+Evaluate the translation based on two criteria:
+1. **Accuracy:** Does the translation faithfully convey the meaning of the source text?
+2. **Fluency:** Is the translation natural and grammatically correct in the target language?
+
+Provide a single score from 1 to 10, where 1 is very poor and 10 is perfect.
+The score should be an integer.
+Also provide a one-sentence justification for your score.
+
+Format your response EXACTLY as follows:
+SCORE: [number]
+JUSTIFICATION: [your justification]
+
+Example Response:
+SCORE: 8
+JUSTIFICATION: The translation is accurate but sounds slightly unnatural in one phrase.
+
+---
+
+SOURCE TEXT ({source_lang_name}):
+{source_text}
+
+---
+
+TRANSLATION ({target_lang_name}):
+{translation}"""
+    
+    return prompt
+
 def evaluate_translation(source_lang: str, target_lang: str, source_text: str, translation: str) -> dict:
     """Evaluate translation quality using LLM"""
     logger.info(f"Starting evaluation: {source_lang} -> {target_lang}")
@@ -149,22 +207,13 @@ def evaluate_translation(source_lang: str, target_lang: str, source_text: str, t
         logger.error("Evaluation API key not available")
         return {"success": False, "error": "Evaluation API key not found"}
     
-    # Load evaluator prompt
-    eval_prompt_path = PROJECT_ROOT / "evaluation/prompts/evaluator-prompt.txt"
-    if not eval_prompt_path.exists():
-        logger.error(f"Evaluator prompt not found: {eval_prompt_path}")
-        return {"success": False, "error": "Evaluator prompt not found"}
-    
+    # Get evaluation prompt
     try:
-        eval_prompt_template = eval_prompt_path.read_text(encoding="utf-8")
-        eval_prompt = eval_prompt_template.replace("{{source_lang}}", LANGUAGES.get(source_lang, source_lang))
-        eval_prompt = eval_prompt.replace("{{target_lang}}", LANGUAGES.get(target_lang, target_lang))
-        eval_prompt = eval_prompt.replace("{{source_text}}", source_text)
-        eval_prompt = eval_prompt.replace("{{translation_text}}", translation)
-        logger.debug(f"Loaded evaluator prompt from {eval_prompt_path}")
+        eval_prompt = get_evaluation_prompt(source_lang, target_lang, source_text, translation)
+        logger.debug(f"Using evaluation prompt for {source_lang}-{target_lang}")
     except Exception as e:
-        logger.error(f"Error reading evaluator prompt {eval_prompt_path}: {e}")
-        return {"success": False, "error": f"Error reading evaluator prompt: {e}"}
+        logger.error(f"Error getting evaluation prompt: {e}")
+        return {"success": False, "error": f"Error getting evaluation prompt: {e}"}
     
     # Make API call
     payload = {

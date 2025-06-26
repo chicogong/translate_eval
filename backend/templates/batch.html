@@ -3,220 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batch Evaluation Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Translation Evaluation Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
         }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+        
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        .score-badge {
-            font-size: 1.1em;
-            font-weight: bold;
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        .action-card {
-            border: none;
-            border-radius: 15px;
-            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
         }
-        .btn-gradient {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border: none;
-            color: white;
-            transition: all 0.3s ease;
+        
+        .control-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-        .btn-gradient:hover {
-            background: linear-gradient(45deg, #764ba2, #667eea);
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+        
+        .stat-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
             color: white;
         }
-        .stats-card {
-            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-            color: white;
-            border-radius: 15px;
+        
+        .stat-icon.score { background: linear-gradient(135deg, var(--success-color), #22c55e); }
+        .stat-icon.bleu { background: linear-gradient(135deg, var(--secondary-color), #0891b2); }
+        .stat-icon.count { background: linear-gradient(135deg, var(--warning-color), #eab308); }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
         }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .btn-custom {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), #6366f1);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, #3730a3, var(--primary-color));
+            transform: translateY(-1px);
+            color: white;
+        }
+        
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #22c55e);
+            color: white;
+        }
+        
+        .btn-warning-custom {
+            background: linear-gradient(135deg, var(--warning-color), #eab308);
+            color: white;
+        }
+        
+        .results-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
         .table-container {
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.3em;
+        
+        .table {
+            margin-bottom: 0;
         }
-        .welcome-card {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        
+        .table thead th {
+            background: var(--dark-color);
+            color: white;
             border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+        
+        .table tbody td {
+            padding: 1rem;
+            border-color: #e2e8f0;
+        }
+        
+        .score-badge {
+            padding: 0.25rem 0.75rem;
             border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
-        .batch-action-card {
-            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
-            border: none;
-            border-radius: 15px;
-            transition: all 0.3s ease;
+        
+        .score-excellent { background: #dcfce7; color: #166534; }
+        .score-good { background: #fef3c7; color: #92400e; }
+        .score-poor { background: #fee2e2; color: #991b1b; }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px dashed var(--secondary-color);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
         }
-        .batch-action-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
-        .progress-bar-custom {
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            height: 8px;
-            border-radius: 4px;
+        
+        .feature-item {
+            text-align: center;
+            padding: 1rem;
         }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .feature-icon.translate { background: linear-gradient(135deg, var(--primary-color), #6366f1); }
+        .feature-icon.evaluate { background: linear-gradient(135deg, var(--success-color), #22c55e); }
+        .feature-icon.analyze { background: linear-gradient(135deg, var(--warning-color), #eab308); }
     </style>
 </head>
 <body>
-    <nav class="navbar gradient-bg mb-4">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand text-white" href="/">
-                <i class="fas fa-language me-2"></i>Translation Evaluation Tool
+            <a class="navbar-brand text-white fw-bold" href="/">
+                <i class="fas fa-language me-2"></i>Translation Evaluation Dashboard
             </a>
-            <a class="btn btn-light" href="/">
+            <a class="btn btn-light btn-sm" href="/">
                 <i class="fas fa-arrow-left me-1"></i>Back to Translator
             </a>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <label for="source-lang" class="form-label">Source Language</label>
-                <select id="source-lang" class="form-select">
-                    {% for code, name in languages.items() %}
-                    <option value="{{ code }}">{{ name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="target-lang" class="form-label">Target Language</label>
-                <select id="target-lang" class="form-select">
-                    {% for code, name in languages.items() %}
-                    <option value="{{ code }}" {% if code == 'zh' %}selected{% endif %}>{{ name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="run-select" class="form-label">Evaluation Run</label>
-                <select id="run-select" class="form-select">
-                    <option value="">Loading runs...</option>
-                </select>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button id="load-results" class="btn btn-gradient w-100">
-                    <i class="fas fa-database me-1"></i>Load Results
-                </button>
-            </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="card action-card card-hover">
-                    <div class="card-body">
-                        <h6 class="card-title">
-                            <i class="fas fa-rocket me-2 text-primary"></i>Quick Actions
-                        </h6>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="loadSampleData()">
-                                <i class="fas fa-eye me-1"></i>View Sample Data
-                            </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="loadLatestRun()">
-                                <i class="fas fa-clock me-1"></i>Load Latest Run
-                            </button>
-                            <button type="button" class="btn btn-outline-success btn-sm" onclick="refreshRuns()">
-                                <i class="fas fa-sync me-1"></i>Refresh Runs
-                            </button>
-                        </div>
-                    </div>
+    <div class="main-container">
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="row align-items-end mb-4">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Source Language</label>
+                    <select id="source-lang" class="form-select">
+                        {% for code, name in languages.items() %}
+                        <option value="{{ code }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Target Language</label>
+                    <select id="target-lang" class="form-select">
+                        {% for code, name in languages.items() %}
+                        <option value="{{ code }}" {% if code == 'zh' %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Evaluation Run</label>
+                    <select id="run-select" class="form-select">
+                        <option value="">Loading runs...</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button id="load-results" class="btn btn-primary-custom btn-custom w-100">
+                        <i class="fas fa-search me-1"></i>Load Results
+                    </button>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card batch-action-card card-hover">
-                    <div class="card-body">
-                        <h6 class="card-title">
-                            <i class="fas fa-cogs me-2 text-success"></i>Batch Operations
-                        </h6>
-                        <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-success btn-sm" onclick="startBatchTranslation()">
-                                <i class="fas fa-language me-1"></i>Batch Translate
-                            </button>
-                            <button type="button" class="btn btn-warning btn-sm" onclick="startBatchEvaluation()">
-                                <i class="fas fa-star me-1"></i>Batch Evaluate
-                            </button>
-                        </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="fw-semibold mb-3"><i class="fas fa-bolt me-2 text-primary"></i>Quick Actions</h6>
+                    <div class="btn-group w-100" role="group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="loadSampleData()">
+                            <i class="fas fa-eye me-1"></i>Sample Data
+                        </button>
+                        <button type="button" class="btn btn-outline-info" onclick="loadLatestRun()">
+                            <i class="fas fa-clock me-1"></i>Latest Run
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="refreshRuns()">
+                            <i class="fas fa-sync me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-semibold mb-3"><i class="fas fa-cogs me-2 text-success"></i>Batch Operations</h6>
+                    <div class="btn-group w-100" role="group">
+                        <button type="button" class="btn btn-success-custom btn-custom" onclick="startBatchTranslation()">
+                            <i class="fas fa-language me-1"></i>Translate
+                        </button>
+                        <button type="button" class="btn btn-warning-custom btn-custom" onclick="startBatchEvaluation()">
+                            <i class="fas fa-star me-1"></i>Evaluate
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Results Section -->
         <div id="results-section" style="display:none;">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h4 class="mb-3">
-                        <i class="fas fa-chart-bar me-2 text-primary"></i>Evaluation Results 
-                        <span id="result-count" class="badge bg-gradient score-badge"></span>
-                    </h4>
+            <!-- Statistics Cards -->
+            <div class="stats-grid" id="summary-section" style="display:none;">
+                <div class="stat-card">
+                    <div class="stat-icon score">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value" id="avg-score">-</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bleu">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value" id="avg-bleu">-</div>
+                    <div class="stat-label">Average BLEU</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon count">
+                        <i class="fas fa-list-ol"></i>
+                    </div>
+                    <div class="stat-value" id="total-items">-</div>
+                    <div class="stat-label">Total Items</div>
                 </div>
             </div>
             
-            <div class="row mb-4" id="summary-section" style="display:none;">
-                <div class="col-md-4">
-                    <div class="card stats-card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-star me-2"></i>Average Score
-                            </h5>
-                            <h2 id="avg-score" class="mb-0">-</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card stats-card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-chart-line me-2"></i>Average BLEU
-                            </h5>
-                            <h2 id="avg-bleu" class="mb-0">-</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card stats-card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-list-ol me-2"></i>Total Items
-                            </h5>
-                            <h2 id="total-items" class="mb-0">-</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-body">
-                    <canvas id="score-chart" height="120"></canvas>
-                </div>
+            <!-- Chart -->
+            <div class="chart-container">
+                <h5 class="fw-semibold mb-3">
+                    <i class="fas fa-chart-bar me-2 text-primary"></i>Translation Quality Scores
+                </h5>
+                <canvas id="score-chart" height="100"></canvas>
             </div>
 
-            <div class="table-container">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0" id="results-table">
-                        <thead class="table-dark">
+            <!-- Results Table -->
+            <div class="results-container">
+                <h5 class="fw-semibold mb-3">
+                    <i class="fas fa-table me-2 text-primary"></i>Detailed Results
+                    <span id="result-count" class="badge bg-primary ms-2"></span>
+                </h5>
+                <div class="table-container">
+                    <table class="table table-hover" id="results-table">
+                        <thead>
                             <tr>
-                                <th><i class="fas fa-hashtag me-1"></i>Line #</th>
-                                <th><i class="fas fa-star me-1"></i>Score</th>
-                                <th><i class="fas fa-chart-line me-1"></i>BLEU</th>
-                                <th><i class="fas fa-file-text me-1"></i>Source Text</th>
-                                <th><i class="fas fa-language me-1"></i>Translation</th>
-                                <th><i class="fas fa-comment me-1"></i>Justification</th>
+                                <th width="8%">Line</th>
+                                <th width="10%">Score</th>
+                                <th width="10%">BLEU</th>
+                                <th width="30%">Source Text</th>
+                                <th width="30%">Translation</th>
+                                <th width="12%">Actions</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -225,56 +341,53 @@
             </div>
         </div>
 
-        <div id="no-data" class="card welcome-card">
-            <div class="card-body text-center">
-                <h4 class="card-title">
-                    <i class="fas fa-rocket me-2 text-primary"></i>Welcome to Batch Evaluation Dashboard
-                </h4>
-                <p class="card-text mb-4">
-                    Comprehensive translation quality assessment with AI-powered evaluation and visual analytics.
-                </p>
-                
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="d-flex flex-column align-items-center">
-                            <i class="fas fa-language fa-3x text-primary mb-2"></i>
-                            <h6>Select Languages</h6>
-                            <small class="text-muted">Choose source and target languages</small>
-                        </div>
+        <!-- Welcome Screen -->
+        <div id="no-data" class="welcome-card">
+            <h2 class="fw-bold text-primary mb-3">
+                <i class="fas fa-chart-line me-2"></i>Translation Evaluation Dashboard
+            </h2>
+            <p class="lead text-muted mb-4">
+                Analyze translation quality with AI-powered evaluation and comprehensive metrics
+            </p>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon translate">
+                        <i class="fas fa-language"></i>
                     </div>
-                    <div class="col-md-4">
-                        <div class="d-flex flex-column align-items-center">
-                            <i class="fas fa-clock fa-3x text-success mb-2"></i>
-                            <h6>Pick Evaluation Run</h6>
-                            <small class="text-muted">Select from available runs</small>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-flex flex-column align-items-center">
-                            <i class="fas fa-chart-bar fa-3x text-warning mb-2"></i>
-                            <h6>View Results</h6>
-                            <small class="text-muted">Analyze evaluation data</small>
-                        </div>
-                    </div>
+                    <h6 class="fw-semibold">Batch Translation</h6>
+                    <p class="text-muted small">Process multiple texts across language pairs</p>
                 </div>
-                
-                <div class="d-flex justify-content-center gap-3">
-                    <button class="btn btn-gradient" onclick="loadSampleData()">
-                        <i class="fas fa-eye me-1"></i>View Sample Data
-                    </button>
-                    <button class="btn btn-outline-primary" onclick="loadLatestRun()">
-                        <i class="fas fa-clock me-1"></i>Load Latest Run
-                    </button>
-                    <button class="btn btn-outline-success" onclick="startBatchTranslation()">
-                        <i class="fas fa-language me-1"></i>Start Translation
-                    </button>
+                <div class="feature-item">
+                    <div class="feature-icon evaluate">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h6 class="fw-semibold">AI Evaluation</h6>
+                    <p class="text-muted small">Get quality scores and detailed feedback</p>
                 </div>
+                <div class="feature-item">
+                    <div class="feature-icon analyze">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h6 class="fw-semibold">Visual Analytics</h6>
+                    <p class="text-muted small">Explore results with interactive charts</p>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button class="btn btn-primary-custom btn-custom me-2" onclick="loadSampleData()">
+                    <i class="fas fa-play me-1"></i>Try Sample Data
+                </button>
+                <button class="btn btn-outline-primary btn-custom" onclick="loadLatestRun()">
+                    <i class="fas fa-clock me-1"></i>Load Latest Results
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.min.js"></script>
     <script src="{{ url_for('static', filename='js/batch.js') }}"></script>
 </body>
 </html> 
