@@ -8,7 +8,6 @@ import os
 import sys
 import json
 import time
-import requests
 import argparse
 import logging
 from pathlib import Path
@@ -19,6 +18,9 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 # Project root & default version
 PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from backend.services import TranslationService, EvaluationService
 
 # Version identifier for result directory (overridden in main)
 RESULT_VERSION = os.environ.get('RESULT_VERSION', 'v1')
@@ -61,44 +63,6 @@ try:
 except LookupError:
     logger.info("Downloading NLTK punkt tokenizer")
     nltk.download('punkt')
-
-def get_translation_config():
-    """获取翻译API配置"""
-    config = {
-        'api_key': os.environ.get('TRANSLATION_API_KEY'),
-        'api_url': os.environ.get('TRANSLATION_API_URL'),
-        'model': os.environ.get('TRANSLATION_MODEL')
-    }
-    
-    if not config['api_key']:
-        logger.error("Translation API key not found in environment variables")
-    
-    logger.debug(f"Translation API config loaded: url={config['api_url']}, model={config['model']}")
-    return config
-
-def get_evaluation_config():
-    """获取评估API配置"""
-    config = {
-        'api_key': os.environ.get('EVALUATION_API_KEY'),
-        'api_url': os.environ.get('EVALUATION_API_URL'),
-        'model': os.environ.get('EVALUATION_MODEL')
-    }
-    
-    if not config['api_key']:
-        logger.error("Evaluation API key not found in environment variables")
-    
-    logger.debug(f"Evaluation API config loaded: url={config['api_url']}, model={config['model']}")
-    return config
-
-def load_prompt_template(source_lang: str, target_lang: str) -> str:
-    """Load the translation prompt template for the given language pair"""
-    prompt_file = PROJECT_ROOT / f"evaluation/prompts/{source_lang}-{target_lang}.txt"
-    if not prompt_file.exists():
-        logger.error(f"Prompt file not found: {prompt_file}")
-        raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
-    
-    logger.debug(f"Loading prompt template from {prompt_file}")
-    return prompt_file.read_text(encoding="utf-8")
 
 def load_test_cases(lang: str) -> list:
     """Load test cases for a specific language"""
@@ -237,138 +201,8 @@ def load_evaluation_results(source_lang: str, target_lang: str, eval_run_id: str
     logger.info(f"Loaded {len(results)} evaluation results from {evaluations_dir}")
     return results
 
-def load_evaluator_prompt() -> str:
-    """Load the evaluator prompt template"""
-    eval_prompt_path = PROJECT_ROOT / "evaluation/prompts/evaluator-prompt.txt"
-    if not eval_prompt_path.exists():
-        logger.error(f"Evaluator prompt not found: {eval_prompt_path}")
-        raise FileNotFoundError(f"Evaluator prompt not found: {eval_prompt_path}")
-    
-    logger.debug(f"Loading evaluator prompt from {eval_prompt_path}")
-    return eval_prompt_path.read_text(encoding="utf-8")
-
-def translate_text(source_lang: str, target_lang: str, text: str) -> dict:
-    """Translate text using the API"""
-    logger.info(f"Translating text: {source_lang} -> {target_lang}, length: {len(text)}")
-    
-    config = get_translation_config()
-    if not config['api_key']:
-        logger.error("Translation API key not available")
-        return {"success": False, "error": "Translation API key not found"}
-    
-    try:
-        prompt_template = load_prompt_template(source_lang, target_lang)
-        system_prompt = prompt_template.split("SOURCE TEXT:")[0].strip()
-        user_content = text
-    except Exception as e:
-        logger.error(f"Error loading prompt template: {e}")
-        return {"success": False, "error": f"Error loading prompt: {e}"}
-    
-    payload = {
-        'model': config['model'],
-        'messages': [
-            {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': user_content}
-        ]
-    }
-    headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {config["api_key"]}'}
-    
-    try:
-        logger.debug(f"Making translation API call with model {config['model']}")
-        response = requests.post(config['api_url'], headers=headers, data=json.dumps(payload), timeout=60)
-        response.raise_for_status()
-        response_data = response.json()
-        
-        if "choices" in response_data and response_data["choices"]:
-            translation = response_data["choices"][0]["message"]["content"]
-            logger.info(f"Translation successful, result length: {len(translation)}")
-            return {"success": True, "translation": translation}
-        else:
-            logger.error(f"Invalid translation API response: {response_data}")
-            return {"success": False, "error": "Invalid API response"}
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Translation API request failed: {e}")
-        return {"success": False, "error": str(e)}
-    except Exception as e:
-        logger.error(f"Unexpected error during translation: {e}")
-        return {"success": False, "error": str(e)}
-
-def evaluate_translation(source_lang: str, target_lang: str, source_text: str, translation: str) -> dict:
-    """Evaluate translation quality using LLM"""
-    logger.info(f"Evaluating translation: {source_lang} -> {target_lang}")
-    
-    config = get_evaluation_config()
-    if not config['api_key']:
-        logger.error("Evaluation API key not available")
-        return {"success": False, "error": "Evaluation API key not found"}
-    
-    try:
-        eval_prompt_template = load_evaluator_prompt()
-        
-        # Language mapping for prompt
-        languages = {
-            'en': 'English',
-            'zh': '中文',
-            'ja': '日本語',
-            'pt': 'Português',
-            'es': 'Español'
-        }
-        
-        eval_prompt = eval_prompt_template.replace("{{source_lang}}", languages.get(source_lang, source_lang))
-        eval_prompt = eval_prompt.replace("{{target_lang}}", languages.get(target_lang, target_lang))
-        eval_prompt = eval_prompt.replace("{{source_text}}", source_text)
-        eval_prompt = eval_prompt.replace("{{translation_text}}", translation)
-    except Exception as e:
-        logger.error(f"Error preparing evaluation prompt: {e}")
-        return {"success": False, "error": f"Error preparing evaluation prompt: {e}"}
-    
-    payload = {
-        'model': config['model'],
-        'messages': [{'role': 'user', 'content': eval_prompt}]
-    }
-    headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {config["api_key"]}'}
-    
-    try:
-        logger.debug(f"Making evaluation API call with model {config['model']}")
-        response = requests.post(config['api_url'], headers=headers, data=json.dumps(payload), timeout=60)
-        response.raise_for_status()
-        eval_data = response.json()
-        
-        if "choices" in eval_data and eval_data["choices"]:
-            eval_result_str = eval_data["choices"][0]["message"]["content"].strip()
-            
-            # Parse score and justification
-            score = "N/A"
-            justification = "No justification provided."
-            
-            lines = eval_result_str.split('\n')
-            for line in lines:
-                line = line.strip()
-                if line.startswith("SCORE:"):
-                    try:
-                        score = int(line.split("SCORE:")[1].strip())
-                        logger.debug(f"Parsed evaluation score: {score}")
-                    except (ValueError, IndexError):
-                        logger.warning(f"Failed to parse score from line: {line}")
-                        score = "N/A"
-                elif line.startswith("JUSTIFICATION:"):
-                    justification = line.split("JUSTIFICATION:")[1].strip()
-                    logger.debug(f"Parsed justification length: {len(justification)}")
-            
-            logger.info(f"Evaluation successful, score: {score}")
-            return {"success": True, "score": score, "justification": justification}
-        else:
-            logger.error(f"Invalid evaluation API response: {eval_data}")
-            return {"success": False, "error": "Invalid evaluation response"}
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Evaluation API request failed: {e}")
-        return {"success": False, "error": str(e)}
-    except Exception as e:
-        logger.error(f"Unexpected error during evaluation: {e}")
-        return {"success": False, "error": str(e)}
-
 def generate_report(version: str = RESULT_VERSION):
-    """Generate evaluation report for a given version"""
+    """Generate a summary report from result files"""
     logger.info("Generating evaluation report")
     
     results_dir = PROJECT_ROOT / "data/results" / version
@@ -423,11 +257,12 @@ def main():
     
     args = parser.parse_args()
     RESULT_VERSION = args.version
+
+    translation_service = TranslationService()
+    evaluation_service = EvaluationService()
     
     # Check if API keys are available
-    translation_config = get_translation_config()
-    evaluation_config = get_evaluation_config()
-    if not translation_config['api_key'] or not evaluation_config['api_key']:
+    if not translation_service.config.get('api_key') or not evaluation_service.config.get('api_key'):
         logger.error("API keys not found. Please create a .env file with your API keys.")
         logger.error("You can use .env.example as a template.")
         sys.exit(1)
@@ -484,9 +319,9 @@ def main():
             logger.info(f"🔄 Processing line {line_num}: {source_text[:50]}...")
             
             # Translate
-            translation_result = translate_text(src_lang, tgt_lang, source_text)
-            if not translation_result["success"]:
-                logger.error(f"Translation failed: {translation_result['error']}")
+            translation_result = translation_service.translate_text(src_lang, tgt_lang, source_text)
+            if not translation_result.get("success"):
+                logger.error(f"Translation failed: {translation_result.get('error')}")
                 total_processed += 1
                 continue
             
@@ -494,15 +329,15 @@ def main():
             logger.info(f"📄 Translation: {translation[:50]}...")
             
             # Evaluate
-            eval_result = evaluate_translation(src_lang, tgt_lang, source_text, translation)
-            if eval_result["success"]:
+            eval_result = evaluation_service.evaluate_translation(src_lang, tgt_lang, source_text, translation)
+            if eval_result.get("success"):
                 score = eval_result["score"]
                 justification = eval_result["justification"]
                 logger.info(f"⭐ Score: {score}/10")
             else:
-                logger.warning(f"Evaluation failed: {eval_result['error']}")
+                logger.warning(f"Evaluation failed: {eval_result.get('error')}")
                 score = "N/A"
-                justification = f"Evaluation failed: {eval_result['error']}"
+                justification = f"Evaluation failed: {eval_result.get('error')}"
             
             # Calculate BLEU score (if reference available)
             bleu_score = None
@@ -513,7 +348,7 @@ def main():
                        translation, score, justification, bleu_score, version=RESULT_VERSION)
             
             total_processed += 1
-            if eval_result["success"]:
+            if eval_result.get("success"):
                 total_successful += 1
             
             # Rate limiting
