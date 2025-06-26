@@ -6,11 +6,20 @@ A modern, open-source platform for multilingual translation, evaluation, and TTS
 
 - 🌐 **Multilingual Translation (AI LLM-based)**: Translate between major languages using state-of-the-art LLMs
 - 🤖 **Automatic Language Detection**
-- 🚀 **Batch Translation & Evaluation**
+- 🚀 **Batch Translation & Evaluation**: Process multiple texts concurrently with intelligent queuing and progress tracking
 - 📊 **AI-powered Evaluation (LLM-based)**: Semantic accuracy, BLEU, fluency, and overall score
 - 🎵 **Text-to-Speech (TTS)**: MiniMax T2A V2 API integration
 - 🖥️ **Modern Web UI**: Playground, file upload, history, and statistics
 - 📦 **API-first Design**: Easy integration for developers
+
+### Batch Processing Features
+
+- **Concurrent Processing**: Up to 10 simultaneous translation/evaluation tasks
+- **Progress Tracking**: Real-time progress updates and completion status
+- **File Upload Support**: Upload .txt files for batch processing
+- **Result Export**: Download translation and evaluation results
+- **History Management**: Track and review all batch operations
+- **Error Handling**: Robust error recovery and retry mechanisms
 
 ### Supported Languages
 
@@ -58,10 +67,18 @@ Set the following environment variables (in your shell or a `.env` file):
 
 ```bash
 # Required for translation (AI LLM)
-deepseek_api_key=your_deepseek_api_key
+TRANSLATION_API_KEY=your_translation_api_key
+TRANSLATION_API_URL=https://api.openai.com/v1/chat/completions
+TRANSLATION_MODEL=gpt-4
+
+# Required for evaluation (AI LLM)
+EVALUATION_API_KEY=your_evaluation_api_key
+EVALUATION_API_URL=https://api.openai.com/v1/chat/completions
+EVALUATION_MODEL=gpt-4
+
 # Optional for TTS
-minimax_api_key=your_minimax_api_key
-minimax_group_id=your_minimax_group_id
+MINIMAX_API_KEY=your_minimax_api_key
+MINIMAX_GROUP_ID=your_minimax_group_id
 # Optional: custom port
 FLASK_PORT=8888
 ```
@@ -86,6 +103,10 @@ See [API_DOCS.md](API_DOCS.md) for full details.
 - `POST /api/evaluate` — Evaluate translation (AI LLM)
 - `POST /api/tts` — Text-to-speech synthesis
 - `GET /api/history` — Translation & evaluation history
+- `POST /api/batch-translate` — Start batch translation
+- `POST /api/batch-evaluate` — Start batch evaluation
+- `GET /api/available-runs` — Get available batch runs
+- `GET /api/evaluation-results` — Get batch evaluation results
 
 ## Project Structure
 

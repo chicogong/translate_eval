@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Translation Evaluation API provides endpoints for translating text and evaluating translation quality using AI models. The API supports 5 languages (English, Chinese, Japanese, Portuguese, Spanish) with 20 translation directions.
+The Translation Evaluation API provides endpoints for translating text and evaluating translation quality using AI Large Language Models (LLMs). The API supports 20 languages with 240 translation directions, plus text-to-speech synthesis and batch processing capabilities.
 
 ## Base URL
 
@@ -16,19 +16,34 @@ API keys are configured via environment variables. No authentication headers are
 
 ## Supported Languages
 
-| Code | Language | Native Name |
-|------|----------|-------------|
-| `en` | English | English |
-| `zh` | Chinese | 中文 |
-| `ja` | Japanese | 日本語 |
-| `pt` | Portuguese | Português |
-| `es` | Spanish | Español |
+| Code | Language | Native Name | Flag |
+|------|----------|-------------|------|
+| `en` | English | English | 🇺🇸 |
+| `zh` | Chinese | 中文 | 🇨🇳 |
+| `ja` | Japanese | 日本語 | 🇯🇵 |
+| `pt` | Portuguese | Português | 🇧🇷 |
+| `es` | Spanish | Español | 🇪🇸 |
+| `fr` | French | Français | 🇫🇷 |
+| `de` | German | Deutsch | 🇩🇪 |
+| `it` | Italian | Italiano | 🇮🇹 |
+| `ko` | Korean | 한국어 | 🇰🇷 |
+| `ru` | Russian | Русский | 🇷🇺 |
+| `nl` | Dutch | Nederlands | 🇳🇱 |
+| `sv` | Swedish | Svenska | 🇸🇪 |
+| `no` | Norwegian | Norsk | 🇳🇴 |
+| `da` | Danish | Dansk | 🇩🇰 |
+| `fi` | Finnish | Suomi | 🇫🇮 |
+| `pl` | Polish | Polski | 🇵🇱 |
+| `cs` | Czech | Čeština | 🇨🇿 |
+| `hu` | Hungarian | Magyar | 🇭🇺 |
+| `tr` | Turkish | Türkçe | 🇹🇷 |
+| `ar` | Arabic | العربية | 🇦🇷 |
 
 ## API Endpoints
 
 ### 1. Translate Text
 
-Translate text from one language to another using AI translation models.
+Translate text from one language to another using AI LLM models.
 
 **Endpoint:** `POST /api/translate`
 
@@ -75,7 +90,7 @@ curl -X POST http://localhost:8888/api/translate \
 
 ### 2. Evaluate Translation
 
-Evaluate the quality of a translation using AI evaluation models.
+Evaluate the quality of a translation using AI LLM evaluation models.
 
 **Endpoint:** `POST /api/evaluate`
 
@@ -122,7 +137,95 @@ curl -X POST http://localhost:8888/api/evaluate \
   }'
 ```
 
-### 3. Get Available Runs
+### 3. Text-to-Speech (TTS)
+
+Convert text to speech using MiniMax T2A V2 API.
+
+**Endpoint:** `POST /api/tts`
+
+**Request Body:**
+```json
+{
+  "text": "Hello world",
+  "language": "en"
+}
+```
+
+**Parameters:**
+- `text` (string, required): Text to convert to speech
+- `language` (string, required): Language code (en, zh, ja, pt, es)
+
+**Response:**
+```json
+{
+  "success": true,
+  "audio_data": "base64_encoded_audio_data",
+  "format": "mp3",
+  "voice_id": "male-01"
+}
+```
+
+**Example Usage:**
+```bash
+curl -X POST http://localhost:8888/api/tts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hello world",
+    "language": "en"
+  }'
+```
+
+### 4. Get TTS Voices
+
+Get available TTS voices for a language.
+
+**Endpoint:** `GET /api/tts/voices`
+
+**Query Parameters:**
+- `language` (string, optional): Language code to filter voices
+
+**Response:**
+```json
+{
+  "success": true,
+  "voices": [
+    {
+      "voice_id": "male-01",
+      "name": "Male Voice 1",
+      "language": "en"
+    }
+  ]
+}
+```
+
+### 5. Get Translation History
+
+Retrieve translation and evaluation history.
+
+**Endpoint:** `GET /api/history`
+
+**Response:**
+```json
+{
+  "success": true,
+  "history": [
+    {
+      "run_id": "20241226_1500",
+      "type": "translation",
+      "timestamp": "20241226_1500",
+      "language_pairs": [
+        {
+          "pair": "en-zh",
+          "items": 15
+        }
+      ],
+      "total_items": 15
+    }
+  ]
+}
+```
+
+### 6. Get Available Runs
 
 Retrieve available translation and evaluation runs.
 
@@ -142,7 +245,7 @@ Retrieve available translation and evaluation runs.
 curl http://localhost:8888/api/available-runs
 ```
 
-### 4. Get Evaluation Results
+### 7. Get Evaluation Results
 
 Retrieve evaluation results for a specific run and language pair.
 
@@ -179,7 +282,7 @@ Retrieve evaluation results for a specific run and language pair.
 curl "http://localhost:8888/api/evaluation-results?eval_run_id=20241226_1500&source_lang=en&target_lang=zh"
 ```
 
-### 5. Start Batch Translation
+### 8. Start Batch Translation
 
 Start a batch translation process for a language pair.
 
@@ -220,7 +323,7 @@ curl -X POST http://localhost:8888/api/batch-translate \
   }'
 ```
 
-### 6. Start Batch Evaluation
+### 9. Start Batch Evaluation
 
 Start a batch evaluation process for translated content.
 
@@ -262,6 +365,42 @@ curl -X POST http://localhost:8888/api/batch-evaluate \
   }'
 ```
 
+### 10. Playground Run
+
+Run translation and evaluation for multiple texts in real-time.
+
+**Endpoint:** `POST /api/playground-run`
+
+**Request Body:**
+```json
+{
+  "source_lang": "en",
+  "target_lang": "zh",
+  "texts": ["Hello world", "How are you?"]
+}
+```
+
+**Parameters:**
+- `source_lang` (string, required): Source language code
+- `target_lang` (string, required): Target language code
+- `texts` (array, required): Array of texts to process (max 20)
+
+**Response:**
+```json
+{
+  "success": true,
+  "results": [
+    {
+      "source_text": "Hello world",
+      "translation": "你好世界",
+      "evaluation_score": 9,
+      "justification": "Excellent translation"
+    }
+  ],
+  "avg_score": 8.5
+}
+```
+
 ## Error Handling
 
 All API endpoints return JSON responses with a `success` field indicating the operation status.
@@ -294,6 +433,7 @@ All API endpoints return JSON responses with a `success` field indicating the op
 The API implements request delays to avoid overwhelming external translation services. Default delays:
 - Translation requests: 1.0 second between calls
 - Evaluation requests: 1.0 second between calls
+- TTS requests: 0.5 second between calls
 
 ## File Structure
 
@@ -342,6 +482,16 @@ def evaluate_translation(source_text, translation, source_lang, target_lang):
     response = requests.post(url, json=data)
     return response.json()
 
+# Text-to-speech
+def text_to_speech(text, language):
+    url = "http://localhost:8888/api/tts"
+    data = {
+        "text": text,
+        "language": language
+    }
+    response = requests.post(url, json=data)
+    return response.json()
+
 # Usage
 result = translate_text("Hello world", "en", "zh")
 if result["success"]:
@@ -351,6 +501,10 @@ if result["success"]:
     if eval_result["success"]:
         print(f"Score: {eval_result['score']}/10")
         print(f"Justification: {eval_result['justification']}")
+    
+    tts_result = text_to_speech(translation, "zh")
+    if tts_result["success"]:
+        print(f"Audio generated: {tts_result['format']}")
 ```
 
 ### JavaScript Example
@@ -389,18 +543,39 @@ async function evaluateTranslation(sourceText, translation, sourceLang, targetLa
     return await response.json();
 }
 
+// Text-to-speech
+async function textToSpeech(text, language) {
+    const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            text: text,
+            language: language
+        })
+    });
+    return await response.json();
+}
+
 // Usage
 translateText("Hello world", "en", "zh")
     .then(result => {
         if (result.success) {
             const translation = result.translation;
-            return evaluateTranslation("Hello world", translation, "en", "zh");
+            return Promise.all([
+                evaluateTranslation("Hello world", translation, "en", "zh"),
+                textToSpeech(translation, "zh")
+            ]);
         }
     })
-    .then(evalResult => {
+    .then(([evalResult, ttsResult]) => {
         if (evalResult.success) {
             console.log(`Score: ${evalResult.score}/10`);
             console.log(`Justification: ${evalResult.justification}`);
+        }
+        if (ttsResult.success) {
+            console.log(`Audio generated: ${ttsResult.format}`);
         }
     });
 ```
@@ -410,20 +585,24 @@ translateText("Hello world", "en", "zh")
 The API requires environment variables for external service configuration:
 
 ```bash
-# Translation API Configuration
+# Translation API Configuration (Required for translation)
 TRANSLATION_API_KEY=your_translation_api_key
 TRANSLATION_API_URL=https://api.openai.com/v1/chat/completions
 TRANSLATION_MODEL=gpt-4
 
-# Evaluation API Configuration  
+# Evaluation API Configuration (Required for evaluation)
 EVALUATION_API_KEY=your_evaluation_api_key
 EVALUATION_API_URL=https://api.openai.com/v1/chat/completions
 EVALUATION_MODEL=gpt-4
 
+# MiniMax TTS API Configuration (Optional for TTS)
+MINIMAX_API_KEY=your_minimax_api_key
+MINIMAX_GROUP_ID=your_minimax_group_id
+
 # Server Configuration
 FLASK_HOST=127.0.0.1
 FLASK_PORT=8888
-FLASK_DEBUG=True
+FLASK_ENV=production
 ```
 
 ## Getting Started
