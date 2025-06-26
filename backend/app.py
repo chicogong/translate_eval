@@ -116,6 +116,100 @@ def api_examples():
     """Return a dictionary of example sentences for the playground."""
     return jsonify(EXAMPLES)
 
+@app.route('/api/history')
+def api_history():
+    """Get translation and evaluation history"""
+    try:
+        data_dir = Path('data')
+        translations_dir = data_dir / 'translations'
+        evaluations_dir = data_dir / 'evaluations'
+        
+        history = []
+        
+        # Get all translation runs
+        if translations_dir.exists():
+            for run_dir in sorted(translations_dir.iterdir(), reverse=True):
+                if run_dir.is_dir():
+                    run_id = run_dir.name
+                    run_info = {
+                        'run_id': run_id,
+                        'type': 'translation',
+                        'timestamp': run_id,  # Assuming format YYYYMMDD_HHMM
+                        'language_pairs': []
+                    }
+                    
+                    # Count language pairs and items
+                    total_items = 0
+                    for lang_pair_dir in run_dir.iterdir():
+                        if lang_pair_dir.is_dir():
+                            lang_pair = lang_pair_dir.name
+                            item_count = len(list(lang_pair_dir.glob('*.json')))
+                            run_info['language_pairs'].append({
+                                'pair': lang_pair,
+                                'items': item_count
+                            })
+                            total_items += item_count
+                    
+                    run_info['total_items'] = total_items
+                    if total_items > 0:
+                        history.append(run_info)
+        
+        # Get all evaluation runs
+        if evaluations_dir.exists():
+            for run_dir in sorted(evaluations_dir.iterdir(), reverse=True):
+                if run_dir.is_dir():
+                    run_id = run_dir.name
+                    run_info = {
+                        'run_id': run_id,
+                        'type': 'evaluation',
+                        'timestamp': run_id,
+                        'language_pairs': []
+                    }
+                    
+                    # Count language pairs and calculate average scores
+                    total_items = 0
+                    total_score = 0
+                    score_count = 0
+                    
+                    for lang_pair_dir in run_dir.iterdir():
+                        if lang_pair_dir.is_dir():
+                            lang_pair = lang_pair_dir.name
+                            pair_scores = []
+                            
+                            for eval_file in lang_pair_dir.glob('*.json'):
+                                try:
+                                    with open(eval_file, 'r', encoding='utf-8') as f:
+                                        eval_data = json.load(f)
+                                        if isinstance(eval_data.get('evaluation_score'), (int, float)):
+                                            pair_scores.append(eval_data['evaluation_score'])
+                                except:
+                                    continue
+                            
+                            if pair_scores:
+                                avg_score = sum(pair_scores) / len(pair_scores)
+                                run_info['language_pairs'].append({
+                                    'pair': lang_pair,
+                                    'items': len(pair_scores),
+                                    'avg_score': round(avg_score, 2)
+                                })
+                                total_items += len(pair_scores)
+                                total_score += sum(pair_scores)
+                                score_count += len(pair_scores)
+                    
+                    run_info['total_items'] = total_items
+                    run_info['avg_score'] = round(total_score / score_count, 2) if score_count > 0 else None
+                    if total_items > 0:
+                        history.append(run_info)
+        
+        # Sort by timestamp (newest first)
+        history.sort(key=lambda x: x['timestamp'], reverse=True)
+        
+        return jsonify({"success": True, "history": history[:20]})  # Limit to 20 most recent
+        
+    except Exception as e:
+        logger.error(f"Error getting history: {e}")
+        return jsonify({"success": False, "error": str(e)})
+
 @app.route('/api/playground-run', methods=['POST'])
 def api_playground_run():
     """Run translation and evaluation for a list of texts from the playground."""

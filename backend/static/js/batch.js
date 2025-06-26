@@ -13,6 +13,7 @@ class PlaygroundDashboard {
         this.summarySection = document.getElementById('summary-section');
         this.avgScoreSpan = document.getElementById('avg-score');
         this.avgBleuSpan = document.getElementById('avg-bleu');
+        this.fluencyRateSpan = document.getElementById('fluency-rate');
         this.totalItemsSpan = document.getElementById('total-items');
         this.resultsTableBody = document.querySelector('#results-table tbody');
         this.chartCanvas = document.getElementById('score-chart');
@@ -39,6 +40,185 @@ class PlaygroundDashboard {
                 this.populateExamples();
             }
         });
+        
+        // File upload functionality
+        this.setupFileUpload();
+        
+        // History functionality
+        this.setupHistory();
+    }
+    
+    setupFileUpload() {
+        const fileUploadArea = document.getElementById('file-upload-area');
+        const fileInput = document.getElementById('file-input');
+        const selectFileBtn = document.getElementById('select-file-btn');
+        
+        // Click to select file
+        selectFileBtn.addEventListener('click', () => fileInput.click());
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+        
+        // File input change
+        fileInput.addEventListener('change', (e) => this.handleFileSelect(e.target.files[0]));
+        
+        // Drag and drop
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+        
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('dragover');
+        });
+        
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                this.handleFileSelect(files[0]);
+            }
+        });
+    }
+    
+    handleFileSelect(file) {
+        if (!file) return;
+        
+        if (!file.name.endsWith('.txt')) {
+            alert('Please select a .txt file');
+            return;
+        }
+        
+        if (file.size > 1024 * 1024) { // 1MB limit
+            alert('File size must be less than 1MB');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            this.textArea.value = content;
+            
+            // Show success message
+            const uploadArea = document.getElementById('file-upload-area');
+            const originalHTML = uploadArea.innerHTML;
+            uploadArea.innerHTML = `
+                <div class="upload-placeholder">
+                    <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+                    <p class="mb-2 text-success">File "${file.name}" loaded successfully!</p>
+                    <small class="text-muted">${content.split('\n').filter(line => line.trim()).length} lines loaded</small>
+                </div>
+            `;
+            
+            // Reset after 3 seconds
+            setTimeout(() => {
+                uploadArea.innerHTML = originalHTML;
+                this.setupFileUpload(); // Re-bind events
+            }, 3000);
+        };
+        
+        reader.onerror = () => {
+            alert('Error reading file');
+        };
+        
+        reader.readAsText(file);
+    }
+    
+    setupHistory() {
+        const historyBtn = document.getElementById('history-btn');
+        historyBtn.addEventListener('click', () => this.showHistory());
+    }
+    
+    async showHistory() {
+        const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+        modal.show();
+        
+        const loadingDiv = document.getElementById('history-loading');
+        const contentDiv = document.getElementById('history-content');
+        const errorDiv = document.getElementById('history-error');
+        const tableBody = document.getElementById('history-table-body');
+        
+        // Reset states
+        loadingDiv.style.display = 'block';
+        contentDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        try {
+            const response = await fetch('/api/history');
+            const data = await response.json();
+            
+            if (data.success) {
+                tableBody.innerHTML = '';
+                
+                if (data.history.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                No history found. Start by running some translations!
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    data.history.forEach(item => {
+                        const row = document.createElement('tr');
+                        
+                        // Format timestamp
+                        const timestamp = this.formatTimestamp(item.timestamp);
+                        
+                        // Format language pairs
+                        const langPairs = item.language_pairs.map(pair => {
+                            const score = pair.avg_score ? ` (${pair.avg_score})` : '';
+                            return `${pair.pair} (${pair.items}${score})`;
+                        }).join(', ');
+                        
+                        // Type badge
+                        const typeBadge = item.type === 'translation' 
+                            ? '<span class="badge bg-primary">Translation</span>'
+                            : '<span class="badge bg-success">Evaluation</span>';
+                        
+                        // Average score
+                        const avgScore = item.avg_score ? 
+                            `<span class="badge bg-info">${item.avg_score}/10</span>` : 
+                            '<span class="text-muted">-</span>';
+                        
+                        row.innerHTML = `
+                            <td><code>${item.run_id}</code></td>
+                            <td>${typeBadge}</td>
+                            <td><small>${langPairs}</small></td>
+                            <td class="text-center">${item.total_items}</td>
+                            <td class="text-center">${avgScore}</td>
+                            <td><small>${timestamp}</small></td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                }
+                
+                loadingDiv.style.display = 'none';
+                contentDiv.style.display = 'block';
+            } else {
+                throw new Error(data.error || 'Failed to load history');
+            }
+        } catch (error) {
+            console.error('Error loading history:', error);
+            loadingDiv.style.display = 'none';
+            errorDiv.style.display = 'block';
+        }
+    }
+    
+    formatTimestamp(timestamp) {
+        // Convert YYYYMMDD_HHMM to readable format
+        if (timestamp.length === 13 && timestamp.includes('_')) {
+            const [date, time] = timestamp.split('_');
+            const year = date.substring(0, 4);
+            const month = date.substring(4, 6);
+            const day = date.substring(6, 8);
+            const hour = time.substring(0, 2);
+            const minute = time.substring(2, 4);
+            
+            return `${year}-${month}-${day} ${hour}:${minute}`;
+        }
+        return timestamp;
     }
 
     async loadAndPopulateExamples() {
@@ -158,9 +338,14 @@ class PlaygroundDashboard {
 
         this.renderChart(lineLabels, scores);
 
+        // Calculate fluency rate (percentage of scores >= 7)
+        const fluencyRate = scores.length > 0 ? 
+            (scores.filter(score => score >= 7).length / scores.length * 100).toFixed(1) : 0;
+
         // Update summary elements
         this.avgScoreSpan.textContent = avgScore ? avgScore.toFixed(2) : 'N/A';
         this.avgBleuSpan.textContent = avgBleu ? avgBleu.toFixed(3) : 'N/A';
+        this.fluencyRateSpan.textContent = fluencyRate + '%';
         this.totalItemsSpan.textContent = results.length;
     }
 
