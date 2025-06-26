@@ -1,7 +1,0 @@
-O novo algoritmo utiliza um mecanismo de atenção multi-cabeça para processar dependências de longo alcance em dados sequenciais, superando o desempenho dos modelos anteriores em conjuntos de dados de referência. 
-
-Explicação das escolhas de tradução:
-1. "多头注意力机制" foi traduzido como "mecanismo de atenção multi-cabeça", que é o termo técnico padrão em português para "multi-head attention mechanism".
-2. "长程依赖关系" foi traduzido como "dependências de longo alcance", mantendo o significado técnico de "long-range dependencies".
-3. "基准数据集" foi traduzido como "conjuntos de dados de referência", que é a expressão mais comum em português para "benchmark datasets".
-4. A estrutura da frase foi reorganizada para seguir a sintaxe natural do português, com o sujeito no início e a informação principal no final.

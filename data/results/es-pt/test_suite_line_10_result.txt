@@ -1,7 +1,0 @@
-O modelo de aprendizado de máquina foi treinado em um conjunto de dados curado para realizar análises de sentimentos em conteúdo gerado pelo usuário.  
-
-**Notas sobre a tradução:**  
-1. "Aprendizaje automático" foi traduzido como "aprendizado de máquina", o termo técnico padrão em português.  
-2. "Conjunto de dados" foi mantido, pois é amplamente utilizado em português.  
-3. "Análisis de sentimientos" foi traduzido como "análises de sentimentos", evitando o falso cognato "análise de sentimentos" (que poderia sugerir uma interpretação diferente).  
-4. A estrutura da frase foi mantida natural e fluente em português, sem necessidade de grandes alterações.

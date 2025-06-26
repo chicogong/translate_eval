@@ -17,8 +17,11 @@ from dotenv import load_dotenv
 import nltk
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
-# Get the project root directory
+# Project root & default version
 PROJECT_ROOT = Path(__file__).parent.parent
+
+# Version identifier for result directory (overridden in main)
+RESULT_VERSION = os.environ.get('RESULT_VERSION', 'v1')
 
 # Load environment variables
 load_dotenv(PROJECT_ROOT / '.env')
@@ -112,12 +115,12 @@ def load_test_cases(lang: str) -> list:
 
 def save_result(source_lang: str, target_lang: str, line_num: int, 
                 source_text: str, translation: str, score: int, 
-                justification: str, bleu_score: float = None):
+                justification: str, bleu_score: float = None, version: str = RESULT_VERSION):
     """Save translation result to file"""
-    results_dir = PROJECT_ROOT / f"data/results/{source_lang}-{target_lang}"
+    results_dir = PROJECT_ROOT / f"data/results/{version}/{source_lang}-{target_lang}"
     results_dir.mkdir(parents=True, exist_ok=True)
     
-    result_file = results_dir / f"test_suite_line_{line_num}_result.txt"
+    result_file = results_dir / f"test_suite_line_{line_num}_result.json"
     
     result_data = {
         "source_lang": source_lang,
@@ -266,16 +269,16 @@ def evaluate_translation(source_lang: str, target_lang: str, source_text: str, t
         logger.error(f"Unexpected error during evaluation: {e}")
         return {"success": False, "error": str(e)}
 
-def generate_report():
-    """Generate evaluation report from all results"""
+def generate_report(version: str = RESULT_VERSION):
+    """Generate evaluation report for a given version"""
     logger.info("Generating evaluation report")
     
-    results_dir = PROJECT_ROOT / "data/results"
+    results_dir = PROJECT_ROOT / "data/results" / version
     if not results_dir.exists():
         logger.warning("No results directory found")
         return
     
-    report_file = PROJECT_ROOT / "docs/Test_Report.md"
+    report_file = PROJECT_ROOT / f"docs/Test_Report_{version}.md"
     report_file.parent.mkdir(exist_ok=True)
     
     all_results = []
@@ -283,7 +286,7 @@ def generate_report():
     # Collect all result files
     for lang_pair_dir in results_dir.iterdir():
         if lang_pair_dir.is_dir():
-            for result_file in lang_pair_dir.glob("test_suite_line_*_result.txt"):
+            for result_file in lang_pair_dir.glob("test_suite_line_*_result.json"):
                 try:
                     with open(result_file, 'r', encoding='utf-8') as f:
                         result_data = json.load(f)
@@ -306,19 +309,22 @@ def generate_report():
             
             f.write(f"| {result['source_lang']} | {result['target_lang']} | {result['line_number']} | "
                    f"{result['evaluation_score']} | {justification_truncated} | {source_text_truncated} | "
-                   f"`data/results/{result['source_lang']}-{result['target_lang']}/test_suite_line_{result['line_number']}_result.txt` | Success |\n")
+                   f"`data/results/{version}/{result['source_lang']}-{result['target_lang']}/test_suite_line_{result['line_number']}_result.json` | Success |\n")
     
     logger.info(f"Report generated: {report_file}")
 
 def main():
     """Main function"""
+    global RESULT_VERSION
     parser = argparse.ArgumentParser(description='Translation Evaluation Tool')
     parser.add_argument('--source', type=str, help='Source language code')
     parser.add_argument('--target', type=str, help='Target language code')
     parser.add_argument('--line', type=int, help='Specific line number to process')
     parser.add_argument('--delay', type=float, default=2.0, help='Delay between API calls (seconds)')
+    parser.add_argument('--version', type=str, default=RESULT_VERSION, help='Version tag for result directory (default v1)')
     
     args = parser.parse_args()
+    RESULT_VERSION = args.version
     
     # Check if API keys are available
     translation_config = get_translation_config()
@@ -406,7 +412,7 @@ def main():
             
             # Save result
             save_result(src_lang, tgt_lang, line_num, source_text, 
-                       translation, score, justification, bleu_score)
+                       translation, score, justification, bleu_score, version=RESULT_VERSION)
             
             total_processed += 1
             if eval_result["success"]:
@@ -418,7 +424,7 @@ def main():
                 time.sleep(args.delay)
     
     # Generate report
-    generate_report()
+    generate_report(version=RESULT_VERSION)
     
     logger.info("🎉 Evaluation Complete!")
     logger.info(f"Total processed: {total_processed}")

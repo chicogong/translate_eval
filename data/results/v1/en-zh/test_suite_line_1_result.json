@@ -1,0 +1,11 @@
+{
+  "source_lang": "en",
+  "target_lang": "zh",
+  "line_number": 1,
+  "source_text": "The novel algorithm leverages a multi-head attention mechanism to process long-range dependencies in sequential data, outperforming previous models on benchmark datasets.",
+  "translation": "该创新算法采用多头注意力机制处理序列数据中的长程依赖关系，在基准数据集上的表现优于以往模型。",
+  "evaluation_score": 10,
+  "justification": "The translation is both accurate and fluent, perfectly conveying the technical meaning of the source text in natural Chinese.",
+  "bleu_score": null,
+  "timestamp": "2025-06-26T09:48:01.222973"
+}

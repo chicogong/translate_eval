@@ -38,6 +38,13 @@
             <div class="col-md-4 d-flex align-items-end">
                 <button id="load-results" class="btn btn-primary w-100"><i class="fas fa-database me-1"></i>Load Results</button>
             </div>
+            <div class="col-md-2">
+                <label for="version-select" class="form-label">Version</label>
+                <select id="version-select" class="form-select">
+                    <option value="v1" selected>v1</option>
+                    <option value="v2">v2</option>
+                </select>
+            </div>
         </div>
 
         <div id="results-section" style="display:none;">
@@ -57,6 +64,7 @@
                             <th>BLEU</th>
                             <th>Source Text</th>
                             <th>Translation</th>
+                            <th>Justification</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

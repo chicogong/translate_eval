@@ -1,1 +1,0 @@
-El modelo de aprendizaje automático fue entrenado con un conjunto de datos seleccionado para realizar análisis de sentimientos en contenido generado por usuarios.

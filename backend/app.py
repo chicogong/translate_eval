@@ -55,6 +55,9 @@ LANGUAGES = {
     'es': 'Español'
 }
 
+# Default version tag (can be overridden via env)
+DEFAULT_VERSION = os.environ.get("RESULT_VERSION", "v1")
+
 def get_translation_config():
     """获取翻译API配置"""
     config = {
@@ -258,45 +261,46 @@ def api_evaluate():
 
 # ========= Batch Evaluation Utilities =========
 
-def collect_results(source_lang: str, target_lang: str):
+def collect_results(source_lang: str, target_lang: str, version: str = DEFAULT_VERSION):
     """Collect all result dicts for a language pair.
     Supports both new-style JSON result files (preferred) and legacy plain-text files.
     Returns a list of dicts (may be partial info for legacy files).
     """
-    results_path = PROJECT_ROOT / f"data/results/{source_lang}-{target_lang}"
+    results_path = PROJECT_ROOT / f"data/results/{version}/{source_lang}-{target_lang}"
     if not results_path.exists():
         return []
 
     result_dicts: List[Dict] = []
-    pattern = "test_suite_line_*_result.txt"
-    for file_path in results_path.glob(pattern):
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read().strip()
-                if not content:
-                    continue
-                # If content looks like JSON (starts with { or [), attempt to parse
-                if content[0] in "[{":
-                    result = json.loads(content)
-                else:
-                    # Legacy plain text translation; build minimal dict
-                    # Extract line number from filename
-                    m = re.search(r"line_(\d+)_", file_path.name)
-                    line_num = int(m.group(1)) if m else 0
-                    result = {
-                        "source_lang": source_lang,
-                        "target_lang": target_lang,
-                        "line_number": line_num,
-                        "source_text": "N/A",
-                        "translation": content,
-                        "evaluation_score": None,
-                        "justification": "Legacy result – no evaluation data",
-                    }
-                result_dicts.append(result)
-        except json.JSONDecodeError:
-            logger.warning(f"Skipping non-JSON result file {file_path} (invalid JSON)")
-        except Exception as e:
-            logger.error(f"Failed to read result file {file_path}: {e}")
+    patterns = ["test_suite_line_*_result.json", "test_suite_line_*_result.txt"]
+    for pat in patterns:
+        for file_path in results_path.glob(pat):
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read().strip()
+                    if not content:
+                        continue
+                    # If content looks like JSON (starts with { or [), attempt to parse
+                    if content[0] in "[{":
+                        result = json.loads(content)
+                    else:
+                        # Legacy plain text translation; build minimal dict
+                        # Extract line number from filename
+                        m = re.search(r"line_(\d+)_", file_path.name)
+                        line_num = int(m.group(1)) if m else 0
+                        result = {
+                            "source_lang": source_lang,
+                            "target_lang": target_lang,
+                            "line_number": line_num,
+                            "source_text": "N/A",
+                            "translation": content,
+                            "evaluation_score": None,
+                            "justification": "Legacy result – no evaluation data",
+                        }
+                    result_dicts.append(result)
+            except json.JSONDecodeError:
+                logger.warning(f"Skipping non-JSON result file {file_path} (invalid JSON)")
+            except Exception as e:
+                logger.error(f"Failed to read result file {file_path}: {e}")
 
     result_dicts.sort(key=lambda x: x.get("line_number", 0))
     return result_dicts
@@ -324,6 +328,7 @@ def api_results():
     """
     source_lang = request.args.get('source_lang')
     target_lang = request.args.get('target_lang')
+    version = request.args.get('version', DEFAULT_VERSION)
 
     if not source_lang or not target_lang:
         return jsonify({"success": False, "error": "source_lang and target_lang are required."}), 400
@@ -331,12 +336,12 @@ def api_results():
     if source_lang == target_lang:
         return jsonify({"success": False, "error": "source_lang and target_lang must be different."}), 400
 
-    results = collect_results(source_lang, target_lang)
+    results = collect_results(source_lang, target_lang, version=version)
     if not results:
         return jsonify({"success": False, "error": "No results found for the specified language pair."})
 
     summary = summarize_results(results)
-    return jsonify({"success": True, **summary, "results": results})
+    return jsonify({"success": True, "version": version, **summary, "results": results})
 
 if __name__ == '__main__':
     host = os.environ.get('FLASK_HOST', '127.0.0.1')

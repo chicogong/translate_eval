@@ -3,6 +3,7 @@ class BatchDashboard {
         this.sourceSelect = document.getElementById('source-lang');
         this.targetSelect = document.getElementById('target-lang');
         this.loadBtn = document.getElementById('load-results');
+        this.versionSelect = document.getElementById('version-select');
         this.resultsSection = document.getElementById('results-section');
         this.noDataAlert = document.getElementById('no-data');
         this.resultCountBadge = document.getElementById('result-count');
@@ -20,6 +21,15 @@ class BatchDashboard {
 
     bindEvents() {
         this.loadBtn.addEventListener('click', () => this.loadResults());
+
+        // When source language changes, auto-set target to first different language
+        this.sourceSelect.addEventListener('change', () => {
+            if (this.sourceSelect.value === this.targetSelect.value) {
+                const options = Array.from(this.targetSelect.options);
+                const newOpt = options.find(opt => opt.value !== this.sourceSelect.value);
+                if (newOpt) this.targetSelect.value = newOpt.value;
+            }
+        });
     }
 
     async loadResults() {
@@ -34,7 +44,8 @@ class BatchDashboard {
         this.setLoading(true);
 
         try {
-            const resp = await fetch(`/api/results?source_lang=${sourceLang}&target_lang=${targetLang}`);
+            const version = this.versionSelect ? this.versionSelect.value : 'v1';
+            const resp = await fetch(`/api/results?source_lang=${sourceLang}&target_lang=${targetLang}&version=${version}`);
             const data = await resp.json();
             if (data.success) {
                 this.displayResults(data.results, data.avg_score, data.avg_bleu);
@@ -78,6 +89,7 @@ class BatchDashboard {
                 <td>${res.bleu_score ?? '-'}</td>
                 <td>${this.escapeHtml(res.source_text).slice(0, 80)}...</td>
                 <td>${this.escapeHtml(res.translation).slice(0, 80)}...</td>
+                <td><span title="${this.escapeHtml(res.justification || '')}">${this.escapeHtml(res.justification || '').slice(0,60)}...</span></td>
             `;
             this.resultsTableBody.appendChild(row);
 

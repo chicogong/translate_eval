@@ -1,7 +1,0 @@
-El modelo de aprendizaje automático fue entrenado en un conjunto de datos seleccionado para realizar análisis de sentimientos en contenido generado por el usuario.  
-
-**Key considerations:**  
-1. **Terminology consistency:** "Aprendizado de máquina" → "Aprendizaje automático" (standard technical term in Spanish).  
-2. **False friends:** "Treinado" → "Entrenado" (not "adiestrado" or "capacitado").  
-3. **Sentence restructuring:** The sentence structure remains natural in Spanish, maintaining the original flow.  
-4. **Dialect sensitivity:** The translation is neutral and suitable for all Spanish-speaking regions.

@@ -1,8 +1,0 @@
-Hemos analizado el impacto socioeconómico de las finanzas descentralizadas (DeFi) en el sistema bancario tradicional. 
-
-[Explanation of translation choices:
-1. "我们分析了" → "Hemos analizado" - Using the present perfect tense in Spanish to indicate a recently completed action
-2. "去中心化金融" → "finanzas descentralizadas" - Standard industry term for DeFi
-3. "传统银行系统" → "sistema bancario tradicional" - Standard financial terminology
-4. "社会经济影响" → "impacto socioeconómico" - Standard academic/economic term
-5. Sentence structure follows natural Spanish syntax with subject-verb-object order and proper adjective-noun agreement]

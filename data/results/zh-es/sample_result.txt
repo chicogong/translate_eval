@@ -1,1 +1,0 @@
-El nuevo algoritmo utiliza un mecanismo de atención múltiple para manejar las dependencias de largo alcance en los datos secuenciales, superando el rendimiento de los modelos anteriores en los conjuntos de datos de referencia.

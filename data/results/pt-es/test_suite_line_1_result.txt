@@ -1,6 +1,0 @@
-El nuevo algoritmo emplea un mecanismo de atención multicabezal para procesar dependencias de largo alcance en datos secuenciales, superando a los modelos anteriores en conjuntos de datos de referencia.  
-
-**Key adjustments:**  
-1. "Mecanismo de atenção multi-cabeça" → "Mecanismo de atención multicabezal" (standard technical term in Spanish).  
-2. "Conjuntos de dados de benchmark" → "Conjuntos de datos de referencia" (avoids the false cognate "benchmark" and uses the standard term).  
-3. Sentence structure remains natural in Spanish while preserving the original meaning.

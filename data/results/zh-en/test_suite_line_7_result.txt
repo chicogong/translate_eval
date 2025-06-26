@@ -1,1 +1,0 @@
-A key challenge in natural language processing lies in resolving lexical ambiguity within context-dependent scenarios.

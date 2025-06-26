@@ -1,1 +1,0 @@
-El proyecto arquitectónico incorpora un enfoque basado en microservicios para incrementar la escalabilidad y la tolerancia a fallos.

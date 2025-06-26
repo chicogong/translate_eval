@@ -1,7 +1,0 @@
-Uno de los principales desafíos en el procesamiento del lenguaje natural es la resolución de la ambigüedad léxica en escenarios dependientes del contexto. 
-
-(Note: The translation maintains technical accuracy while adapting to Spanish syntax. Key points:
-1. "自然言語処理" → "procesamiento del lenguaje natural" (standard technical term)
-2. Made the implicit subject explicit by adding "Uno de"
-3. Restructured from SOV to SVO pattern
-4. Maintained the technical concept of "context-dependent scenarios" as "escenarios dependientes del contexto")

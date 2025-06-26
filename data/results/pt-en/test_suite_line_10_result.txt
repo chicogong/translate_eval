@@ -1,1 +1,0 @@
-The machine learning model was trained on a selected dataset to perform sentiment analysis on user-generated content.

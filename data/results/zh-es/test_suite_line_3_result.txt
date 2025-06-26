@@ -1,7 +1,0 @@
-Nuestra metodología implica un estudio doble ciego y controlado con placebo, diseñado para evaluar la eficacia y seguridad de un nuevo compuesto farmacológico. 
-
-(Note: This translation maintains the technical accuracy of the original text while adapting it to natural Spanish expression patterns. Key elements:
-- "双盲" → "doble ciego" (standard medical term)
-- "安慰剂对照" → "controlado con placebo" (standard clinical trial terminology)
-- "新药物化合物" → "nuevo compuesto farmacológico" (precise technical term)
-- Sentence structure adjusted for Spanish syntax and flow)

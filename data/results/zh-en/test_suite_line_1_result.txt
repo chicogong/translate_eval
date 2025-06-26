@@ -1,1 +1,0 @@
-The novel algorithm employs a multi-head attention mechanism to address long-range dependencies in sequential data, demonstrating superior performance over previous models on benchmark datasets.

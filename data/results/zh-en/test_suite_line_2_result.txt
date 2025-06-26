@@ -1,1 +1,0 @@
-This paper presents a novel quantum cryptography method, with a primary focus on the generation of secure keys through entangled photon pairs.

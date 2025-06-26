@@ -1,1 +1,0 @@
-The study employed a statistical regression model to identify the key drivers of market volatility.

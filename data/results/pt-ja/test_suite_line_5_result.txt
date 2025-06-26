@@ -1,7 +1,0 @@
-分散型金融（DeFi）が伝統的な銀行システムに与える社会経済的影響を分析しました。
-
-（説明）
-1. TERMINOLOGY: "finanças descentralizadas" → 「分散型金融（DeFi）」と専門用語を正確に訳出
-2. HONORIFICS: 学術的・ビジネス文書に適した丁寧体を使用
-3. SENTENCE STRUCTURE: ポルトガル語のSVO構造を日本語のSOV構造に変換
-4. CULTURAL ADAPTATION: 特に必要な文化適応はなし。金融用語は国際的に共通の概念を使用

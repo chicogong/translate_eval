@@ -1,1 +1,0 @@
-Um dos principais desafios no processamento de linguagem natural é resolver a ambiguidade lexical em contextos dependentes da situação.

@@ -1,1 +1,0 @@
-This study employs a statistical regression model to identify the primary factors influencing market volatility.

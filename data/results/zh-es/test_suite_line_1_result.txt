@@ -1,8 +1,0 @@
-Este nuevo algoritmo utiliza un mecanismo de atención múltiple para procesar las dependencias de largo alcance en los datos secuenciales, superando el rendimiento de los modelos anteriores en los conjuntos de datos de referencia. 
-
-Explicación de la traducción:
-1. "多头注意力机制" se traduce como "mecanismo de atención múltiple", que es el término técnico estándar en español para "multi-head attention mechanism"
-2. "长程依赖关系" se traduce como "dependencias de largo alcance", manteniendo el significado técnico preciso
-3. Se reorganizó la estructura de la oración para seguir el orden natural del español (sujeto + verbo + complementos)
-4. Se utilizó "superando el rendimiento" en lugar de una traducción literal de "表现优于" para una expresión más natural en español
-5. "基准数据集" se tradujo como "conjuntos de datos de referencia", que es la terminología comúnmente aceptada en el ámbito técnico

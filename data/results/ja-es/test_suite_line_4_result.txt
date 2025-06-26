@@ -1,8 +1,0 @@
-La transformación digital de la cadena de suministro requiere la integración del Internet de las Cosas (IoT), la tecnología blockchain y la inteligencia artificial para mejorar la transparencia y la eficiencia. 
-
-(Explanation of key translation decisions:
-1. "サプライチェーン" → "cadena de suministro" - Standard technical term
-2. Added parentheses for "IoT" as it's commonly used in Spanish technical contexts
-3. Restructured sentence to SVO pattern: Subject (transformación) + Verb (requiere) + Object (integración)
-4. Maintained technical terms "blockchain" and "inteligencia artificial" as they are widely used in Spanish
-5. Added explicit connectors "para" to clarify purpose)

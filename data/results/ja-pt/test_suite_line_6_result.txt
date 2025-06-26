@@ -1,7 +1,0 @@
-Neste estudo, adotamos um modelo de regressão estatística para identificar os principais fatores que influenciam a volatilidade do mercado. 
-
-[Explanation of translation choices:
-1. "この研究では" → "Neste estudo" - Natural Portuguese opening for academic context
-2. "市場のボラティリティ" → "volatilidade do mercado" - Standard financial terminology
-3. "主要な要因を特定する" → "identificar os principais fatores" - Restructured to SVO pattern
-4. "統計的回帰モデルを採用しています" → "adotamos um modelo de regressão estatística" - Made subject explicit and used standard statistical terminology]

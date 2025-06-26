@@ -1,8 +1,0 @@
-Este estudo investiga a correlação entre a adoção de energias renováveis e a estabilidade da rede a longo prazo.  
-
-**Notas sobre a tradução:**  
-1. **"Correlación"** foi traduzido como **"correlação"**, termo técnico padrão em português.  
-2. **"Energías renovables"** foi traduzido como **"energias renováveis"**, mantendo a precisão técnica.  
-3. **"Estabilidad de la red"** foi traduzido como **"estabilidade da rede"**, evitando o falso cognato "estabilidade" (que poderia ser confundido com "estabilidade" em espanhol, mas é o termo correto em português).  
-4. A estrutura da frase foi mantida natural em português, sem necessidade de grandes alterações.  
-5. A tradução é adequada tanto para o português europeu quanto para o brasileiro, com pequenas variações regionais irrelevantes neste contexto.

@@ -1,8 +1,0 @@
-The architectural design adopts a microservices-based approach to enhance scalability and fault tolerance. 
-
-[Explanation: 
-1. "该架构设计" is translated as "The architectural design" to maintain formality
-2. "采用" is translated as "adopts" for technical accuracy
-3. "基于微服务的方法" is rendered as "a microservices-based approach" using standard industry terminology
-4. "来增强" is converted to "to enhance" for natural English expression
-5. "可伸缩性和容错性" is translated as "scalability and fault tolerance" using standard technical terms]

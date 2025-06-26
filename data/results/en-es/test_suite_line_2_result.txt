@@ -1,1 +1,0 @@
-El sistema emplea un protocolo de consenso tolerante a fallas bizantinas para garantizar la integridad de los datos en el libro mayor distribuido, incluso en presencia de nodos maliciosos.

@@ -1,7 +1,0 @@
-本システムは、ビザンチン障害耐性（Byzantine Fault Tolerance）を備えた合意形成プロトコルを採用しており、悪意のあるノードが存在する場合でも、分散型台帳全体のデータ整合性を保証します。
-
-Explanation:
-1. "Byzantine Fault Tolerant" is translated as ビザンチン障害耐性, the standard Japanese technical term
-2. The sentence structure is reorganized to SOV pattern, with the subject (本システム) at the beginning
-3. Formal language is used throughout, appropriate for technical documentation
-4. The concept is directly translated without cultural adaptation as it is a technical term with universal meaning in computer science
