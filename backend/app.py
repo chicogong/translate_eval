@@ -15,8 +15,16 @@ from batch import run_batch_translation, run_batch_evaluation, run_live_translat
 from examples import EXAMPLES
 from tts_service import TTSService
 
-# Initialize logging
-logger = setup_logging()
+# 简化日志配置
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/app.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -24,8 +32,6 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 translation_service = TranslationService()
 evaluation_service = EvaluationService()
 tts_service = TTSService()
-
-
 
 @app.route('/')
 def index():
@@ -105,8 +111,6 @@ def api_evaluate():
     result = evaluation_service.evaluate_translation(source_lang, target_lang, source_text, translation)
     logger.info(f"Evaluation API result: success={result['success']}")
     return jsonify(result)
-
-# ========= New Routes =========
 
 @app.route('/batch')
 def batch_index():
@@ -276,5 +280,10 @@ def api_playground_run():
         return jsonify({"success": False, "error": f"An unexpected error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    logger.info(f"Starting Flask app on {FLASK_CONFIG['host']}:{FLASK_CONFIG['port']}, debug={FLASK_CONFIG['debug']}")
-    app.run(debug=FLASK_CONFIG['debug'], port=FLASK_CONFIG['port'], host=FLASK_CONFIG['host']) 
+    # 生产环境配置
+    host = os.environ.get('FLASK_HOST', '0.0.0.0')
+    port = int(os.environ.get('FLASK_PORT', 8888))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    
+    logger.info(f"Starting Flask app on {host}:{port}, debug={debug}")
+    app.run(debug=debug, port=port, host=host) 
