@@ -149,6 +149,10 @@ translate_eval/
 
 Contributions are welcome! Please open issues or pull requests to help improve this project.
 
+## Contact
+
+For questions, feedback, or commercial inquiries, please reach out to <chicogong@tencent.com>.
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
