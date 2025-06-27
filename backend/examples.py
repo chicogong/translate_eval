@@ -26,6 +26,15 @@ EXAMPLES = {
                 "Notwithstanding the foregoing, the parties agree to an amicable resolution.",
                 "The complex issue of artificial intelligence ethics requires a nuanced approach that balances innovation with regulatory oversight."
             ]
+        },
+        {
+            "label": "Colloquial Interpretation",
+            "texts": [
+                "You know, I was like, 'no way,' and she was like, 'yeah!'.",
+                "Could you give me a sec? I'll be right with you.",
+                "Let's catch up later and grab some coffee or something.",
+                "I'm kinda worried he might not show up, you know?"
+            ]
         }
     ],
     'zh': [
@@ -55,6 +64,15 @@ EXAMPLES = {
                 "我吃了饭了。",
                 "他竟然说他不知道这件事。"
             ]
+        },
+        {
+            "label": "Colloquial Interpretation",
+            "texts": [
+                "这事儿说来话长，咱们改天再聊吧。",
+                "你先忙你的，我等会儿给你打电话。",
+                "这个菜有点咸呢，再来点水好吗？",
+                "他刚刚说啥来着，我没听清。"
+            ]
         }
     ],
     'ja': [
@@ -83,6 +101,91 @@ EXAMPLES = {
                 "本日はお忙しいところ恐縮ですが、ご確認のほどよろしくお願い申し上げます。",
                 "ご多忙の折とは存じますが、何卒ご容赦いただけますようお願い申し上げます。",
                 "つきましては、お見積書を添付いたしましたので、ご査収ください。"
+            ]
+        },
+        {
+            "label": "Colloquial Interpretation",
+            "texts": [
+                "えっと、なんかさ、昨日の件だけどさ。",
+                "ちょっと待ってくれる？すぐ戻るから。",
+                "あとでお茶でもしながら話そうよ。",
+                "彼、大丈夫かなぁ？来ないかもしれない。"
+            ]
+        }
+    ],
+    'es': [
+        {
+            "label": "Falsos Cognados",
+            "texts": [
+                "Actualmente vivo en Madrid, no actualmente vivo en Madrid.",
+                "Estoy embarazada de trabajo y no puedo más (embarazada ≠ embarrassed).",
+                "Asistiré a la reunión mañana (asistir ≠ assist).",
+                "Eventualmente vendrá a visitarnos (eventualmente ≠ eventually)."
+            ]
+        },
+        {
+            "label": "Ser vs Estar",
+            "texts": [
+                "La sopa está fría ahora.",
+                "Él es aburrido vs Él está aburrido.",
+                "La reunión es en la sala A.",
+                "Estoy listo para salir, no soy listo en matemáticas."
+            ]
+        },
+        {
+            "label": "Tildes y Signos de Interrogación",
+            "texts": [
+                "¿Cómo estás?",
+                "Sé que se te olvidó el bolígrafo.",
+                "Solo vs Sólo (adverbio).",
+                "Mas vs Más, aun vs aún."
+            ]
+        },
+        {
+            "label": "Interpretación Coloquial",
+            "texts": [
+                "Oye, ¿qué tal si quedamos luego para tomar algo?",
+                "Dame un segundo, ahora mismo vuelvo, ¿vale?",
+                "Estoy un poco rayado, ¿y si no aparece?",
+                "En plan, fue como súper raro, ¿sabes?"
+            ]
+        }
+    ],
+    'pt': [
+        {
+            "label": "Falsos Cognatos",
+            "texts": [
+                "Pretendo viajar amanhã (pretender ≠ to pretend).",
+                "Assistir ao filme foi divertido (assistir ≠ assist).",
+                "Ele está constipado (constipado ≠ constipated).",
+                "Vou participar da discussão, não vou participar de dinheiro."
+            ]
+        },
+        {
+            "label": "Uso de Preposições",
+            "texts": [
+                "Ele depende de você, não depende em você.",
+                "Vamos chegar a São Paulo às 10h.",
+                "Pensar em vs pensar de alguém.",
+                "Gostar de fazer algo, não gostar fazer algo."
+            ]
+        },
+        {
+            "label": "Acentuação e Tilde (~)",
+            "texts": [
+                "O órgão público publicou o anúncio.",
+                "Ela tem uma relação sã com o trabalho.",
+                "Pão, mão, coração: não esquecer do til.",
+                "Está, esta, esta? Diferenças de acento."
+            ]
+        },
+        {
+            "label": "Interpretação Coloquial",
+            "texts": [
+                "E aí, a gente se fala mais tarde, beleza?",
+                "Me dá um minutinho, já volto, tá?",
+                "Tô meio preocupado se ele não vai aparecer, sabe?",
+                "Foi tipo, muito estranho, entende?"
             ]
         }
     ]

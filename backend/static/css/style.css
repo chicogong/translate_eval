@@ -1,5 +1,14 @@
 /* Custom styles for Translation Evaluation Tool */
 
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #06b6d4;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --dark-color: #1f2937;
+}
+
 body {
     background-color: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
