@@ -14,7 +14,8 @@ LANGUAGES = {
     'zh': '中文',
     'ja': '日本語',
     'pt': 'Português',
-    'es': 'Español'
+    'es': 'Español',
+    'ko': '한국어'
 }
 
 # Default version tag (can be overridden via env)
@@ -66,7 +67,8 @@ TTS_VOICE_MAPPING = {
     'zh': 'male-qn-qingse',  # 中文男声
     'ja': 'female-yujie',   # 日文女声
     'pt': 'female-shaonv',  # 葡萄牙语使用英文声音
-    'es': 'female-shaonv'   # 西班牙语使用英文声音
+    'es': 'female-shaonv',   # 西班牙语使用英文声音
+    'ko': 'female-shaonv'  # 韩语暂用英文女声
 }
 
 # Flask configuration

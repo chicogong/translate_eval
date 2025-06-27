@@ -77,7 +77,8 @@ LANG_MAP = {
     'en': 'en',
     'ja': 'ja',
     'es': 'es',
-    'pt': 'pt'
+    'pt': 'pt',
+    'ko': 'ko'
 }
 
 def detect_language(text: str) -> str:

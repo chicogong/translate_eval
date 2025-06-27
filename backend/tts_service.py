@@ -144,6 +144,10 @@ class TTSService:
             'ja': [
                 {'id': 'female-yujie', 'name': 'Japanese Female', 'gender': 'female'},
                 {'id': 'male-qn-qingse', 'name': 'Japanese Male', 'gender': 'male'}
+            ],
+            'ko': [
+                {'id': 'female-shaonv', 'name': 'Korean Female (placeholder)', 'gender': 'female'},
+                {'id': 'male-qn-qingse', 'name': 'Korean Male (placeholder)', 'gender': 'male'}
             ]
         }
         

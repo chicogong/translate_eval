@@ -97,6 +97,7 @@ class TestTTSService(unittest.TestCase):
             ('ja', 'female-yujie'),
             ('pt', 'female-shaonv'),
             ('es', 'female-shaonv'),
+            ('ko', 'female-shaonv'),
             ('unknown', 'male-qn-qingse')  # fallback
         ]
         

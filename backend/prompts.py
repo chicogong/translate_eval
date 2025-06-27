@@ -109,6 +109,22 @@ def get_translation_prompt(source_lang: str, target_lang: str) -> str:
         "pt-es": base_template.format(
             source_lang_name="葡萄牙文",
             target_lang_name="西班牙文"
+        ),
+        "en-ko": base_template.format(
+            source_lang_name="英文",
+            target_lang_name="韩文"
+        ),
+        "ko-en": base_template.format(
+            source_lang_name="韩文",
+            target_lang_name="英文"
+        ),
+        "zh-ko": base_template.format(
+            source_lang_name="中文",
+            target_lang_name="韩文"
+        ),
+        "ko-zh": base_template.format(
+            source_lang_name="韩文",
+            target_lang_name="简体中文"
         )
     }
     

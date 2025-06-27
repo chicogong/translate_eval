@@ -231,7 +231,7 @@ def api_text_to_speech():
         return jsonify({"success": False, "error": "Text is required"})
     
     # Validate language
-    if language not in ['en', 'zh', 'ja', 'pt', 'es']:
+    if language not in ['en', 'zh', 'ja', 'pt', 'es', 'ko']:
         logger.warning(f"Unsupported language for TTS: {language}")
         return jsonify({"success": False, "error": f"Unsupported language: {language}"})
     
