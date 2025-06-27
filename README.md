@@ -2,6 +2,14 @@
 
 A modern, open-source platform for multilingual translation, evaluation, and TTS synthesis. All translation and evaluation are powered by AI Large Language Models (LLMs). Supports real-time translation, intelligent evaluation, batch processing, and audio synthesis with a user-friendly web interface.
 
+## Screenshots
+
+![Translation Playground](docs/screenshots/trans_eval.png)
+![Batch Translation & Evaluation](docs/screenshots/batch_trans_eval.png)
+![Evaluation Dashboard](docs/screenshots/eval_stat.png)
+![Evaluation Report](docs/screenshots/report.png)
+![Simultaneous Interpretation](docs/screenshots/simultaneous_interpretation.png)
+
 ## Features
 
 - 🌐 **Multilingual Translation (AI LLM-based)**: Translate between major languages using state-of-the-art LLMs
