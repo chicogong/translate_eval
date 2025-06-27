@@ -35,6 +35,24 @@ EXAMPLES = {
                 "Let's catch up later and grab some coffee or something.",
                 "I'm kinda worried he might not show up, you know?"
             ]
+        },
+        {
+            "label": "Business Negotiation",
+            "texts": [
+                "We'd like to revisit the pricing structure before moving forward.",
+                "Could you clarify the payment terms and delivery schedule?",
+                "Let's aim for a win-win solution that benefits both parties.",
+                "We'll follow up with the amended contract early next week."
+            ]
+        },
+        {
+            "label": "Travel Inquiry",
+            "texts": [
+                "Is there a direct train from the airport to downtown?",
+                "Could you recommend any must-see spots around here?",
+                "Do I need to book tickets in advance for the palace tour?",
+                "What's the best way to get a local SIM card?"
+            ]
         }
     ],
     'zh': [
@@ -72,6 +90,24 @@ EXAMPLES = {
                 "你先忙你的，我等会儿给你打电话。",
                 "这个菜有点咸呢，再来点水好吗？",
                 "他刚刚说啥来着，我没听清。"
+            ]
+        },
+        {
+            "label": "商务洽谈",
+            "texts": [
+                "关于付款方式，我们希望改为月结。",
+                "能否再谈一下运输费用的细节？",
+                "我们希望双方都能在此合作中获益。",
+                "修改后的合同我会在下周一发给您。"
+            ]
+        },
+        {
+            "label": "旅游咨询",
+            "texts": [
+                "请问从机场到市中心有没有直达地铁？",
+                "附近有什么必去的景点推荐吗？",
+                "皇宫参观需要提前订票吗？",
+                "办理当地电话卡最方便的方式是什么？"
             ]
         }
     ],
@@ -111,6 +147,24 @@ EXAMPLES = {
                 "あとでお茶でもしながら話そうよ。",
                 "彼、大丈夫かなぁ？来ないかもしれない。"
             ]
+        },
+        {
+            "label": "ビジネス商談",
+            "texts": [
+                "価格体系を再度見直したいと考えております。",
+                "支払い条件と納期についてご説明いただけますか。",
+                "双方にメリットのあるウィンウィンの解決策を目指しましょう。",
+                "修正版の契約書は来週初めにお送りいたします。"
+            ]
+        },
+        {
+            "label": "旅行案内",
+            "texts": [
+                "空港から市内中心部へ直通の電車はありますか。",
+                "この近くでぜひ行くべき観光スポットを教えてください。",
+                "宮殿の見学は事前予約が必要でしょうか。",
+                "ローカルSIMカードを購入する一番簡単な方法は何ですか。"
+            ]
         }
     ],
     'es': [
@@ -149,6 +203,24 @@ EXAMPLES = {
                 "Estoy un poco rayado, ¿y si no aparece?",
                 "En plan, fue como súper raro, ¿sabes?"
             ]
+        },
+        {
+            "label": "Negociación Empresarial",
+            "texts": [
+                "Nos gustaría revisar la estructura de precios antes de avanzar.",
+                "¿Podrían aclarar los términos de pago y el cronograma de entrega?",
+                "Busquemos una solución de beneficio mutuo para ambas partes.",
+                "Enviaremos el contrato enmendado a principios de la próxima semana."
+            ]
+        },
+        {
+            "label": "Consulta de Viaje",
+            "texts": [
+                "¿Hay un tren directo del aeropuerto al centro?",
+                "¿Podría recomendarme lugares imprescindibles por aquí?",
+                "¿Necesito reservar con antelación la visita al palacio?",
+                "¿Cuál es la mejor manera de conseguir una tarjeta SIM local?"
+            ]
         }
     ],
     'pt': [
@@ -186,6 +258,24 @@ EXAMPLES = {
                 "Me dá um minutinho, já volto, tá?",
                 "Tô meio preocupado se ele não vai aparecer, sabe?",
                 "Foi tipo, muito estranho, entende?"
+            ]
+        },
+        {
+            "label": "Negociação de Negócios",
+            "texts": [
+                "Gostaríamos de rever a estrutura de preços antes de avançar.",
+                "Poderia esclarecer as condições de pagamento e o prazo de entrega?",
+                "Vamos buscar uma solução ganha-ganha que beneficie ambos os lados.",
+                "Enviaremos o contrato revisado no início da próxima semana."
+            ]
+        },
+        {
+            "label": "Consulta de Viagem",
+            "texts": [
+                "Há trem direto do aeroporto para o centro da cidade?",
+                "Você poderia recomendar pontos turísticos imperdíveis por aqui?",
+                "Preciso reservar com antecedência a visita ao palácio?",
+                "Qual é a melhor maneira de obter um chip local?"
             ]
         }
     ]
