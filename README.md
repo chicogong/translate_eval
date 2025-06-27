@@ -4,11 +4,15 @@ A modern, open-source platform for multilingual translation, evaluation, and TTS
 
 ## Screenshots
 
-![Translation Playground](docs/screenshots/trans_eval.png)
-![Batch Translation & Evaluation](docs/screenshots/batch_trans_eval.png)
-![Evaluation Dashboard](docs/screenshots/eval_stat.png)
-![Evaluation Report](docs/screenshots/report.png)
-![Simultaneous Interpretation](docs/screenshots/simultaneous_interpretation.png)
+Below are some key UI pages to give you a quick feel of the Translation Evaluation Tool in action.
+
+| Translation Playground | Batch Translation & Evaluation | Evaluation Dashboard |
+|---|---|---|
+| ![Translation Playground](docs/screenshots/trans_eval.png) | ![Batch Translation & Evaluation](docs/screenshots/batch_trans_eval.png) | ![Evaluation Statistics](docs/screenshots/eval_stat.png) |
+
+| Evaluation Report | Mobile Simultaneous Interpretation |
+|---|---|
+| ![Evaluation Report](docs/screenshots/report.png) | ![Simultaneous Interpretation](docs/screenshots/simultaneous_interpretation.png) |
 
 ## Features
 
