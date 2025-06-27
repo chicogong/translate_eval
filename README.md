@@ -2,6 +2,18 @@
 
 A modern, open-source platform for multilingual translation, evaluation, and TTS synthesis. All translation and evaluation are powered by AI Large Language Models (LLMs). Supports real-time translation, intelligent evaluation, batch processing, and audio synthesis with a user-friendly web interface.
 
+## Screenshots
+
+Below are some key UI pages to give you a quick feel of the Translation Evaluation Tool in action.
+
+| Translation Playground | Batch Translation & Evaluation | Evaluation Dashboard |
+|---|---|---|
+| ![Translation Playground](docs/screenshots/trans_eval.png) | ![Batch Translation & Evaluation](docs/screenshots/batch_trans_eval.png) | ![Evaluation Statistics](docs/screenshots/eval_stat.png) |
+
+| Evaluation Report | Mobile Simultaneous Interpretation |
+|---|---|
+| ![Evaluation Report](docs/screenshots/report.png) | ![Simultaneous Interpretation](docs/screenshots/simultaneous_interpretation.png) |
+
 ## Features
 
 - 🌐 **Multilingual Translation (AI LLM-based)**: Translate between major languages using state-of-the-art LLMs
@@ -136,6 +148,10 @@ translate_eval/
 ## Contributing
 
 Contributions are welcome! Please open issues or pull requests to help improve this project.
+
+## Contact
+
+For questions, feedback, or commercial inquiries, please reach out to <chicogong@tencent.com>.
 
 ## License
 
