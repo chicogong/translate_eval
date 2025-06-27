@@ -18,6 +18,10 @@ class PlaygroundDashboard {
         this.resultsTableBody = document.querySelector('#results-table tbody');
         this.chartCanvas = document.getElementById('score-chart');
         this.scoreChart = null;
+        this.playAllContainer = document.getElementById('play-all-container');
+        this.playAllDropdownBtn = document.getElementById('play-all-dropdown-btn');
+        this.playAllSourcesBtn = document.getElementById('play-all-sources-btn');
+        this.playAllTranslationsBtn = document.getElementById('play-all-translations-btn');
 
         // Data
         this.examples = {}; // Will be fetched from backend
@@ -46,6 +50,9 @@ class PlaygroundDashboard {
         
         // History functionality
         this.setupHistory();
+        
+        // Audio playback
+        this.bindPlayAudioEvents();
     }
     
     setupFileUpload() {
@@ -302,16 +309,20 @@ class PlaygroundDashboard {
             this.resultsSection.style.display = 'none';
             this.noDataAlert.style.display = 'block';
             this.summarySection.style.display = 'none';
+            this.playAllContainer.style.display = 'none';
             return;
         }
 
         this.noDataAlert.style.display = 'none';
         this.resultsSection.style.display = 'block';
         this.summarySection.style.display = 'block';
+        this.playAllContainer.style.display = 'inline-flex';
 
         // Populate table and collect scores for the chart
         const scores = [];
         const lineLabels = [];
+        const sourceLang = this.sourceSelect.value;
+        const targetLang = this.targetSelect.value;
 
         results.forEach(res => {
             const row = document.createElement('tr');
@@ -323,6 +334,18 @@ class PlaygroundDashboard {
                 <td><div class="text-truncate" style="max-width: 250px;" title="${this.escapeHtml(res.source_text)}">${this.escapeHtml(res.source_text)}</div></td>
                 <td><div class="text-truncate" style="max-width: 250px;" title="${this.escapeHtml(res.translation)}">${this.escapeHtml(res.translation)}</div></td>
                 <td class="text-center">
+                    <button class="btn btn-sm btn-outline-secondary play-btn play-source-btn" 
+                            data-text="${this.escapeHtml(res.source_text)}" 
+                            data-lang="${sourceLang}" 
+                            title="Play Source Text">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-info play-btn play-translation-btn" 
+                            data-text="${this.escapeHtml(res.translation)}" 
+                            data-lang="${targetLang}"
+                            title="Play Translation">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
                     <button class="btn btn-sm btn-outline-primary" onclick="showDetailsModal('${res.line_number}', '${this.escapeHtml(res.justification || 'No details available')}')" title="View Details">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -422,6 +445,162 @@ class PlaygroundDashboard {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+    }
+
+    bindPlayAudioEvents() {
+        // Use event delegation for play buttons in the results table
+        this.resultsTableBody.addEventListener('click', (e) => {
+            const target = e.target.closest('.play-btn');
+            if (target) {
+                const text = target.dataset.text;
+                const lang = target.dataset.lang;
+                if (text && lang) {
+                    this.playAudio(text, lang, target);
+                }
+            }
+        });
+
+        this.playAllSourcesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.playAllVisible('source');
+        });
+        this.playAllTranslationsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.playAllVisible('translation');
+        });
+    }
+
+    async playAudio(text, lang, btnElement) {
+        if (!text || !lang) return;
+
+        const originalIcon = btnElement.innerHTML;
+        btnElement.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        btnElement.disabled = true;
+
+        try {
+            const response = await fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, language: lang })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.audio_data) {
+                const audioBlob = this.base64ToBlob(data.audio_data, 'audio/mp3');
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                audio.onended = () => {
+                    btnElement.innerHTML = originalIcon;
+                    btnElement.disabled = false;
+                    URL.revokeObjectURL(audioUrl);
+                };
+                 audio.onerror = () => {
+                    alert('Error playing audio');
+                    btnElement.innerHTML = originalIcon;
+                    btnElement.disabled = false;
+                    URL.revokeObjectURL(audioUrl);
+                };
+                audio.play();
+
+            } else {
+                throw new Error(data.error || 'Failed to get audio data.');
+            }
+        } catch (error) {
+            console.error('TTS Error:', error);
+            alert(`Could not play audio: ${error.message}`);
+            btnElement.innerHTML = originalIcon;
+            btnElement.disabled = false;
+        }
+    }
+
+    async playAllVisible(type) {
+        if (!type) return;
+
+        const rows = this.resultsTableBody.querySelectorAll('tr');
+        this.playAllDropdownBtn.disabled = true;
+        this.playAllDropdownBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Playing...';
+
+        for (const row of rows) {
+            const btn = row.querySelector(`.play-${type}-btn`);
+            if (btn) {
+                const text = btn.dataset.text;
+                const lang = btn.dataset.lang;
+                
+                // Play audio and wait for it to finish
+                await new Promise(async (resolve) => {
+                    if (text && lang) {
+                        const originalIcon = btn.innerHTML;
+                        btn.innerHTML = '<i class="fas fa-pause"></i>';
+                        
+                        const response = await fetch('/api/tts', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: text, language: lang })
+                        });
+                        const data = await response.json();
+                        
+                        if(data.success) {
+                            const audioBlob = this.base64ToBlob(data.audio_data, 'audio/mp3');
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            const audio = new Audio(audioUrl);
+                            audio.onended = () => {
+                                btn.innerHTML = originalIcon;
+                                URL.revokeObjectURL(audioUrl);
+                                // Wait 1 second before playing the next
+                                setTimeout(resolve, 1000); 
+                            };
+                            audio.onerror = () => {
+                                btn.innerHTML = originalIcon;
+                                URL.revokeObjectURL(audioUrl);
+                                setTimeout(resolve, 1000);
+                            }
+                            audio.play();
+                        } else {
+                            // If TTS fails for one, just move on
+                           setTimeout(resolve, 100); 
+                        }
+                    } else {
+                        resolve();
+                    }
+                });
+            }
+        }
+        
+        this.playAllDropdownBtn.disabled = false;
+        this.playAllDropdownBtn.innerHTML = '<i class="fas fa-play-circle me-1"></i> Play All';
+    }
+    
+    base64ToBlob(audioData, mimeType) {
+        try {
+            // Check if the data is hex string (from MiniMax API)
+            if (audioData.match(/^[0-9a-fA-F]+$/)) {
+                // Convert hex string to byte array
+                const byteNumbers = new Array(audioData.length / 2);
+                for (let i = 0; i < audioData.length; i += 2) {
+                    byteNumbers[i / 2] = parseInt(audioData.substr(i, 2), 16);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                return new Blob([byteArray], { type: mimeType });
+            } else {
+                // Handle base64 string
+                // Remove data URL prefix if present
+                const base64 = audioData.replace(/^data:audio\/[^;]+;base64,/, '');
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                
+                const byteArray = new Uint8Array(byteNumbers);
+                return new Blob([byteArray], { type: mimeType });
+            }
+        } catch (error) {
+            console.error('Error converting audio data:', error);
+            throw new Error('Failed to convert audio data');
+        }
     }
 }
 
