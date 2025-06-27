@@ -7,6 +7,7 @@ class TranslationApp {
         this.updateCharCount();
     }
 
+    // --- 1. SETUP METHODS ---
     initializeElements() {
         // Language selectors
         this.sourceLangSelect = document.getElementById('source-lang');
@@ -27,6 +28,8 @@ class TranslationApp {
         this.translateBtn = document.getElementById('translate-btn');
         this.clearBtn = document.getElementById('clear-btn');
         this.evaluateBtn = document.getElementById('evaluate-btn');
+        this.playSourceBtn = document.getElementById('play-source-btn');
+        this.playTranslationBtn = document.getElementById('play-translation-btn');
 
         // Evaluation elements
         this.evaluationSection = document.getElementById('evaluation-section');
@@ -41,10 +44,6 @@ class TranslationApp {
 
         // Example buttons
         this.exampleButtons = document.querySelectorAll('.example-btn');
-
-        // TTS buttons
-        this.playSourceBtn = document.getElementById('play-source-btn');
-        this.playTranslationBtn = document.getElementById('play-translation-btn');
         
         // Audio element for playback
         this.audioPlayer = new Audio();
@@ -60,14 +59,12 @@ class TranslationApp {
             this.resetEvaluation();
         });
 
-        // Translation
+        // Buttons
         this.translateBtn.addEventListener('click', () => this.translateText());
-        
-        // Clear
         this.clearBtn.addEventListener('click', () => this.clearAll());
-
-        // Evaluation
         this.evaluateBtn.addEventListener('click', () => this.evaluateTranslation());
+        this.playSourceBtn.addEventListener('click', () => this.playText('source'));
+        this.playTranslationBtn.addEventListener('click', () => this.playText('translation'));
 
         // Example buttons
         this.exampleButtons.forEach(btn => {
@@ -83,18 +80,33 @@ class TranslationApp {
         this.sourceLangSelect.addEventListener('change', () => this.resetEvaluation());
         this.targetLangSelect.addEventListener('change', () => this.resetEvaluation());
 
-        // Enter key for translation
-        this.sourceText.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') {
-                this.translateText();
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey) {
+                switch (e.key) {
+                    case 'Enter':
+                        this.translateText();
+                        break;
+                    case 't':
+                        e.preventDefault();
+                        this.translateBtn.click();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        if (!this.evaluateBtn.disabled && this.evaluateBtn.style.display !== 'none') {
+                            this.evaluateBtn.click();
+                        }
+                        break;
+                    case 'l':
+                        e.preventDefault();
+                        this.clearBtn.click();
+                        break;
+                }
             }
         });
-
-        // TTS button events
-        this.playSourceBtn.addEventListener('click', () => this.playText('source'));
-        this.playTranslationBtn.addEventListener('click', () => this.playText('translation'));
     }
 
+    // --- 2. CORE ACTION METHODS ---
     swapLanguages() {
         const sourceLang = this.sourceLangSelect.value;
         const targetLang = this.targetLangSelect.value;
@@ -113,21 +125,19 @@ class TranslationApp {
         this.resetEvaluation();
     }
 
-    updateCharCount() {
-        const count = this.sourceText.value.length;
-        this.charCount.textContent = count;
+    clearAll() {
+        this.sourceText.value = '';
+        this.translationText.value = '';
+        this.updateCharCount();
+        this.resetEvaluation();
         
-        // Color coding for character count
-        if (count > 1000) {
-            this.charCount.style.color = '#dc3545';
-        } else if (count > 500) {
-            this.charCount.style.color = '#ffc107';
-        } else {
-            this.charCount.style.color = '#6c757d';
-        }
+        // Disable TTS buttons
+        this.playSourceBtn.disabled = true;
+        this.playTranslationBtn.disabled = true;
         
-        // Enable/disable source TTS button
-        this.playSourceBtn.disabled = !this.sourceText.value.trim();
+        // Stop any playing audio
+        this.audioPlayer.pause();
+        this.audioPlayer.currentTime = 0;
     }
 
     async translateText() {
@@ -135,7 +145,6 @@ class TranslationApp {
         const targetLang = this.targetLangSelect.value;
         const text = this.sourceText.value.trim();
 
-        // Validation
         if (!text) {
             this.showAlert('Please enter some text to translate', 'warning');
             return;
@@ -146,48 +155,37 @@ class TranslationApp {
             return;
         }
 
-        this.showLoading();
+        this.setLoading(true);
         this.translateBtn.disabled = true;
 
-        // Prepare translation parameters
         const requestBody = {
             source_lang: sourceLang,
             target_lang: targetLang,
             text: text
         };
 
-        // Add optional parameters if specified
         if (this.streamModeSelect.value) {
             requestBody.stream = this.streamModeSelect.value === 'true';
         }
-        
         if (this.temperatureInput.value) {
             requestBody.temperature = parseFloat(this.temperatureInput.value);
         }
-        
         if (this.topPInput.value) {
             requestBody.top_p = parseFloat(this.topPInput.value);
         }
 
-        console.log('Translation request:', requestBody);
-
         try {
             const response = await fetch('/api/translate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
             });
-
             const result = await response.json();
 
             if (result.success) {
                 this.translationText.value = result.translation;
                 this.showEvaluationSection();
                 this.showAlert('Translation completed successfully!', 'success');
-                
-                // Enable translation TTS button
                 this.playTranslationBtn.disabled = false;
             } else {
                 this.showAlert(`Translation failed: ${result.error}`, 'danger');
@@ -195,7 +193,7 @@ class TranslationApp {
         } catch (error) {
             this.showAlert(`Network error: ${error.message}`, 'danger');
         } finally {
-            this.hideLoading();
+            this.setLoading(false);
             this.translateBtn.disabled = false;
         }
     }
@@ -211,15 +209,13 @@ class TranslationApp {
             return;
         }
 
-        this.showLoading();
+        this.setLoading(true);
         this.evaluateBtn.disabled = true;
 
         try {
             const response = await fetch('/api/evaluate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     source_lang: sourceLang,
                     target_lang: targetLang,
@@ -227,7 +223,6 @@ class TranslationApp {
                     translation: translation
                 })
             });
-
             const result = await response.json();
 
             if (result.success) {
@@ -239,25 +234,120 @@ class TranslationApp {
         } catch (error) {
             this.showAlert(`Network error: ${error.message}`, 'danger');
         } finally {
-            this.hideLoading();
+            this.setLoading(false);
             this.evaluateBtn.disabled = false;
         }
+    }
+
+    async playText(type) {
+        let text, language, button;
+        
+        if (type === 'source') {
+            text = this.sourceText.value.trim();
+            language = this.sourceLangSelect.value;
+            button = this.playSourceBtn;
+        } else {
+            text = this.translationText.value.trim();
+            language = this.targetLangSelect.value;
+            button = this.playTranslationBtn;
+        }
+
+        if (!text) {
+            this.showAlert('No text to play', 'warning');
+            return;
+        }
+
+        if (text.length > 500) {
+            text = text.substring(0, 500) + '...';
+            this.showAlert('Text truncated to 500 characters for speech synthesis', 'info');
+        }
+
+        const originalHTML = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Loading...';
+
+        try {
+            const response = await fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, language: language })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                const audioBlob = this.base64ToBlob(result.audio_data, 'audio/mp3');
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                this.audioPlayer.pause();
+                this.audioPlayer.currentTime = 0;
+                this.audioPlayer.src = audioUrl;
+                
+                button.innerHTML = '<i class="fas fa-stop me-1"></i>Stop';
+                button.disabled = false;
+                
+                this.audioPlayer.onended = () => {
+                    button.innerHTML = originalHTML;
+                    URL.revokeObjectURL(audioUrl);
+                };
+                
+                this.audioPlayer.onerror = () => {
+                    this.showAlert('Error playing audio', 'danger');
+                    button.innerHTML = originalHTML;
+                    button.disabled = false;
+                    URL.revokeObjectURL(audioUrl);
+                };
+                
+                await this.audioPlayer.play();
+                
+                const stopHandler = () => {
+                    this.audioPlayer.pause();
+                    this.audioPlayer.currentTime = 0;
+                    button.innerHTML = originalHTML;
+                    button.removeEventListener('click', stopHandler);
+                    URL.revokeObjectURL(audioUrl);
+                };
+                button.addEventListener('click', stopHandler, { once: true });
+                
+            } else {
+                this.showAlert(`Text-to-speech failed: ${result.error}`, 'danger');
+            }
+        } catch (error) {
+            this.showAlert(`TTS error: ${error.message}`, 'danger');
+        } finally {
+            if (button.innerHTML.includes('Loading')) {
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }
+        }
+    }
+
+    // --- 3. UI UPDATE METHODS ---
+    updateCharCount() {
+        const count = this.sourceText.value.length;
+        this.charCount.textContent = count;
+        
+        if (count > 1000) {
+            this.charCount.style.color = '#dc3545';
+        } else if (count > 500) {
+            this.charCount.style.color = '#ffc107';
+        } else {
+            this.charCount.style.color = '#6c757d';
+        }
+        
+        this.playSourceBtn.disabled = !this.sourceText.value.trim();
     }
 
     displayEvaluationResult(score, justification) {
         this.scoreValue.textContent = score;
         this.justificationText.textContent = justification;
 
-        // Update progress bar
         const percentage = (score / 10) * 100;
         this.scoreBar.style.width = `${percentage}%`;
         this.scoreBar.setAttribute('aria-valuenow', score);
 
-        // Color coding based on score
         const scoreDisplay = document.querySelector('.score-display');
         const progressBar = this.scoreBar;
         
-        // Remove existing classes
         scoreDisplay.className = 'score-display score-animate';
         progressBar.className = 'progress-bar';
 
@@ -291,35 +381,14 @@ class TranslationApp {
         this.translationText.value = '';
     }
 
-    clearAll() {
-        this.sourceText.value = '';
-        this.translationText.value = '';
-        this.updateCharCount();
-        this.resetEvaluation();
-        
-        // Disable TTS buttons
-        this.playSourceBtn.disabled = true;
-        this.playTranslationBtn.disabled = true;
-        
-        // Stop any playing audio
-        this.audioPlayer.pause();
-        this.audioPlayer.currentTime = 0;
-    }
-
-    showLoading() {
-        this.loadingOverlay.style.display = 'flex';
-    }
-
-    hideLoading() {
-        this.loadingOverlay.style.display = 'none';
+    setLoading(isLoading) {
+        this.loadingOverlay.style.display = isLoading ? 'flex' : 'none';
     }
 
     showAlert(message, type) {
-        // Remove existing alerts
         const existingAlerts = document.querySelectorAll('.alert-dismissible');
         existingAlerts.forEach(alert => alert.remove());
 
-        // Create new alert
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
         alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 10000; min-width: 300px;';
@@ -331,7 +400,6 @@ class TranslationApp {
 
         document.body.appendChild(alertDiv);
 
-        // Auto remove after 5 seconds
         setTimeout(() => {
             if (alertDiv.parentNode) {
                 alertDiv.remove();
@@ -339,110 +407,10 @@ class TranslationApp {
         }, 5000);
     }
 
-    async playText(type) {
-        let text, language, button;
-        
-        if (type === 'source') {
-            text = this.sourceText.value.trim();
-            language = this.sourceLangSelect.value;
-            button = this.playSourceBtn;
-        } else {
-            text = this.translationText.value.trim();
-            language = this.targetLangSelect.value;
-            button = this.playTranslationBtn;
-        }
-
-        if (!text) {
-            this.showAlert('No text to play', 'warning');
-            return;
-        }
-
-        // Limit text length for TTS
-        if (text.length > 500) {
-            text = text.substring(0, 500) + '...';
-            this.showAlert('Text truncated to 500 characters for speech synthesis', 'info');
-        }
-
-        // Update button state
-        const originalHTML = button.innerHTML;
-        button.disabled = true;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Loading...';
-
-        try {
-            const response = await fetch('/api/tts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    text: text,
-                    language: language
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                // Convert base64 to blob and play
-                const audioData = result.audio_data;
-                const audioBlob = this.base64ToBlob(audioData, 'audio/mp3');
-                const audioUrl = URL.createObjectURL(audioBlob);
-                
-                // Stop any currently playing audio
-                this.audioPlayer.pause();
-                this.audioPlayer.currentTime = 0;
-                
-                // Play new audio
-                this.audioPlayer.src = audioUrl;
-                
-                // Update button to show stop functionality
-                button.innerHTML = '<i class="fas fa-stop me-1"></i>Stop';
-                button.disabled = false;
-                
-                // Handle audio events
-                this.audioPlayer.onended = () => {
-                    button.innerHTML = originalHTML;
-                    URL.revokeObjectURL(audioUrl);
-                };
-                
-                this.audioPlayer.onerror = () => {
-                    this.showAlert('Error playing audio', 'danger');
-                    button.innerHTML = originalHTML;
-                    button.disabled = false;
-                    URL.revokeObjectURL(audioUrl);
-                };
-                
-                // Play audio
-                await this.audioPlayer.play();
-                
-                // Update button click handler temporarily
-                const stopHandler = () => {
-                    this.audioPlayer.pause();
-                    this.audioPlayer.currentTime = 0;
-                    button.innerHTML = originalHTML;
-                    button.removeEventListener('click', stopHandler);
-                    URL.revokeObjectURL(audioUrl);
-                };
-                button.addEventListener('click', stopHandler, { once: true });
-                
-            } else {
-                this.showAlert(`Text-to-speech failed: ${result.error}`, 'danger');
-            }
-        } catch (error) {
-            this.showAlert(`TTS error: ${error.message}`, 'danger');
-        } finally {
-            if (button.innerHTML.includes('Loading')) {
-                button.innerHTML = originalHTML;
-                button.disabled = false;
-            }
-        }
-    }
-
+    // --- 4. HELPER METHODS ---
     base64ToBlob(audioData, mimeType) {
         try {
-            // Check if the data is hex string (from MiniMax API)
             if (audioData.match(/^[0-9a-fA-F]+$/)) {
-                // Convert hex string to byte array
                 const byteNumbers = new Array(audioData.length / 2);
                 for (let i = 0; i < audioData.length; i += 2) {
                     byteNumbers[i / 2] = parseInt(audioData.substr(i, 2), 16);
@@ -450,8 +418,6 @@ class TranslationApp {
                 const byteArray = new Uint8Array(byteNumbers);
                 return new Blob([byteArray], { type: mimeType });
             } else {
-                // Handle base64 string
-                // Remove data URL prefix if present
                 const base64 = audioData.replace(/^data:audio\/[^;]+;base64,/, '');
                 const byteCharacters = atob(base64);
                 const byteNumbers = new Array(byteCharacters.length);
@@ -470,31 +436,6 @@ class TranslationApp {
     }
 }
 
-// Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new TranslationApp();
-});
-
-// Add some keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-    // Ctrl+T for translate
-    if (e.ctrlKey && e.key === 't') {
-        e.preventDefault();
-        document.getElementById('translate-btn').click();
-    }
-    
-    // Ctrl+E for evaluate
-    if (e.ctrlKey && e.key === 'e') {
-        e.preventDefault();
-        const evaluateBtn = document.getElementById('evaluate-btn');
-        if (!evaluateBtn.disabled && evaluateBtn.style.display !== 'none') {
-            evaluateBtn.click();
-        }
-    }
-    
-    // Ctrl+L for clear
-    if (e.ctrlKey && e.key === 'l') {
-        e.preventDefault();
-        document.getElementById('clear-btn').click();
-    }
 }); 

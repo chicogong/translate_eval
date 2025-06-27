@@ -1,5 +1,11 @@
 class PlaygroundDashboard {
     constructor() {
+        this.initializeElements();
+        this.bindEvents();
+        this.loadAndPopulateExamples();
+    }
+
+    initializeElements() {
         // UI Elements
         this.sourceSelect = document.getElementById('source-lang');
         this.targetSelect = document.getElementById('target-lang');
@@ -18,6 +24,8 @@ class PlaygroundDashboard {
         this.resultsTableBody = document.querySelector('#results-table tbody');
         this.chartCanvas = document.getElementById('score-chart');
         this.scoreChart = null;
+        
+        // Play All Buttons
         this.playAllContainer = document.getElementById('play-all-container');
         this.playAllDropdownBtn = document.getElementById('play-all-dropdown-btn');
         this.playAllSourcesBtn = document.getElementById('play-all-sources-btn');
@@ -25,9 +33,6 @@ class PlaygroundDashboard {
 
         // Data
         this.examples = {}; // Will be fetched from backend
-
-        this.bindEvents();
-        this.loadAndPopulateExamples();
     }
 
     bindEvents() {
@@ -45,14 +50,34 @@ class PlaygroundDashboard {
             }
         });
         
-        // File upload functionality
+        // File upload, history, and audio playback functionality
         this.setupFileUpload();
-        
-        // History functionality
         this.setupHistory();
-        
-        // Audio playback
-        this.bindPlayAudioEvents();
+        this.bindAudioEvents();
+    }
+
+    bindAudioEvents() {
+        // Use event delegation for individual play buttons in the results table
+        this.resultsTableBody.addEventListener('click', (e) => {
+            const target = e.target.closest('.play-btn');
+            if (target) {
+                const text = target.dataset.text;
+                const lang = target.dataset.lang;
+                if (text && lang) {
+                    this.playAudio(text, lang, target);
+                }
+            }
+        });
+
+        // "Play All" button events
+        this.playAllSourcesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.playAllVisible('source');
+        });
+        this.playAllTranslationsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.playAllVisible('translation');
+        });
     }
     
     setupFileUpload() {
@@ -445,29 +470,6 @@ class PlaygroundDashboard {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
-    }
-
-    bindPlayAudioEvents() {
-        // Use event delegation for play buttons in the results table
-        this.resultsTableBody.addEventListener('click', (e) => {
-            const target = e.target.closest('.play-btn');
-            if (target) {
-                const text = target.dataset.text;
-                const lang = target.dataset.lang;
-                if (text && lang) {
-                    this.playAudio(text, lang, target);
-                }
-            }
-        });
-
-        this.playAllSourcesBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.playAllVisible('source');
-        });
-        this.playAllTranslationsBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.playAllVisible('translation');
-        });
     }
 
     async playAudio(text, lang, btnElement) {
