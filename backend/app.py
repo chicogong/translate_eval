@@ -10,7 +10,7 @@ import threading
 
 from config import LANGUAGES, DEFAULT_VERSION, PROJECT_ROOT, FLASK_CONFIG
 from utils import setup_logging, format_run_id, validate_language_pair, detect_language
-from services import TranslationService, EvaluationService, MultiModelTranslationService
+from services import TranslationService, EvaluationService, MultiModelTranslationService, MultiEvaluationService
 from batch import run_batch_translation, run_batch_evaluation, run_live_translation_and_evaluation
 from examples import EXAMPLES
 from tts_service import TTSService
@@ -32,6 +32,7 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 translation_service = TranslationService()
 evaluation_service = EvaluationService()
 multi_model_service = MultiModelTranslationService()
+multi_evaluation_service = MultiEvaluationService()
 tts_service = TTSService()
 
 @app.route('/')
@@ -187,6 +188,53 @@ def api_compare_translate():
     )
     
     logger.info(f"Multi-model translation result: success={result['success']}")
+    return jsonify(result)
+
+@app.route('/api/evaluators', methods=['GET'])
+def api_get_evaluators():
+    """Get available evaluators"""
+    try:
+        evaluators = multi_evaluation_service.get_available_evaluators()
+        return jsonify({"success": True, "evaluators": evaluators})
+    except Exception as e:
+        logger.error(f"Error getting evaluators: {e}")
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/evaluate/compare', methods=['POST'])
+def api_compare_evaluate():
+    """API endpoint for multi-evaluator translation evaluation"""
+    data = request.get_json()
+    source_lang = data.get('source_lang')
+    target_lang = data.get('target_lang')
+    source_text = data.get('source_text', '').strip()
+    translations = data.get('translations', {})
+    
+    logger.info(f"Multi-evaluator evaluation API called: {source_lang} -> {target_lang}")
+    
+    # Validate required parameters
+    if not source_text:
+        logger.warning("Missing source text in multi-evaluation request")
+        return jsonify({"success": False, "error": "Source text is required"})
+    
+    if not translations:
+        logger.warning("No translations provided for evaluation")
+        return jsonify({"success": False, "error": "Translations are required"})
+    
+    # Validate language pair
+    is_valid, error_msg = validate_language_pair(source_lang, target_lang)
+    if not is_valid:
+        logger.warning(f"Invalid language pair: {error_msg}")
+        return jsonify({"success": False, "error": error_msg})
+    
+    # Call multi-evaluation service
+    result = multi_evaluation_service.evaluate_multiple_translations(
+        source_lang=source_lang,
+        target_lang=target_lang,
+        source_text=source_text,
+        translations=translations
+    )
+    
+    logger.info(f"Multi-evaluator evaluation result: success={result['success']}")
     return jsonify(result)
 
 @app.route('/api/examples')

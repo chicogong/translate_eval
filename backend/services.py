@@ -7,7 +7,7 @@ import requests
 import logging
 from typing import Dict, Generator, Optional, List
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from config import get_translation_config, get_evaluation_config, get_multi_translation_configs
+from config import get_translation_config, get_evaluation_config, get_multi_translation_configs, get_multi_evaluation_configs
 from prompts import get_translation_prompt, get_evaluation_prompt
 
 logger = logging.getLogger(__name__)
@@ -497,3 +497,216 @@ class MultiModelTranslationService:
                 "model_name": config['name'],
                 "model_id": config['id']
             } 
+
+
+class MultiEvaluationService:
+    """多评估服务"""
+    
+    def __init__(self):
+        self.configs = get_multi_evaluation_configs()
+        logger.info(f"Initialized multi-evaluation service with {len(self.configs)} evaluators")
+    
+    def get_available_evaluators(self) -> List[Dict]:
+        """获取可用的评估模型列表"""
+        evaluators = []
+        for config_id, config in self.configs.items():
+            evaluators.append({
+                'id': config['id'],
+                'name': config['name'],
+                'model': config['model']
+            })
+        return evaluators
+    
+    def evaluate_multiple_translations(self, source_lang: str, target_lang: str, 
+                                      source_text: str, translations: Dict[str, Dict]) -> Dict:
+        """使用多个评估模型评估多个翻译结果"""
+        logger.info(f"Starting multi-evaluation for {len(translations)} translations")
+        
+        if not self.configs:
+            return {"success": False, "error": "No evaluators configured"}
+        
+        # 过滤出成功的翻译结果
+        successful_translations = {k: v for k, v in translations.items() if v.get('success', False)}
+        
+        if not successful_translations:
+            return {"success": False, "error": "No successful translations to evaluate"}
+        
+        # 并行评估所有翻译结果
+        evaluation_results = {}
+        with ThreadPoolExecutor(max_workers=len(self.configs) * len(successful_translations)) as executor:
+            # 提交所有评估任务
+            future_to_key = {}
+            for translation_key, translation_result in successful_translations.items():
+                translation_text = translation_result['translation']
+                for evaluator_id in self.configs.keys():
+                    future = executor.submit(
+                        self._evaluate_single_translation,
+                        evaluator_id, source_lang, target_lang, 
+                        source_text, translation_text
+                    )
+                    future_to_key[future] = (translation_key, evaluator_id)
+            
+            # 收集结果
+            for future in as_completed(future_to_key):
+                translation_key, evaluator_id = future_to_key[future]
+                try:
+                    result = future.result()
+                    
+                    if translation_key not in evaluation_results:
+                        evaluation_results[translation_key] = {}
+                    
+                    evaluation_results[translation_key][evaluator_id] = result
+                    logger.info(f"Evaluation completed for {translation_key} by {evaluator_id}")
+                except Exception as e:
+                    logger.error(f"Evaluation failed for {translation_key} by {evaluator_id}: {e}")
+                    if translation_key not in evaluation_results:
+                        evaluation_results[translation_key] = {}
+                    evaluation_results[translation_key][evaluator_id] = {
+                        "success": False, 
+                        "error": str(e),
+                        "evaluator_name": self.configs[evaluator_id]['name']
+                    }
+        
+        # 计算综合评分
+        processed_results = {}
+        for translation_key, evaluator_results in evaluation_results.items():
+            scores = []
+            justifications = []
+            evaluator_details = []
+            
+            for evaluator_id, result in evaluator_results.items():
+                evaluator_details.append({
+                    'evaluator_id': evaluator_id,
+                    'evaluator_name': self.configs[evaluator_id]['name'],
+                    'success': result['success'],
+                    'score': result.get('score', 'N/A'),
+                    'justification': result.get('justification', 'No justification provided'),
+                    'error': result.get('error', None)
+                })
+                
+                if result['success'] and isinstance(result.get('score'), (int, float)):
+                    scores.append(result['score'])
+                    justifications.append(result.get('justification', ''))
+            
+            # 计算平均分
+            avg_score = sum(scores) / len(scores) if scores else 0
+            
+            processed_results[translation_key] = {
+                'average_score': round(avg_score, 2),
+                'evaluator_count': len(evaluator_results),
+                'successful_evaluations': len(scores),
+                'evaluator_details': evaluator_details,
+                'combined_justification': self._combine_justifications(justifications)
+            }
+        
+        return {
+            "success": True,
+            "results": processed_results,
+            "summary": {
+                "total_translations": len(successful_translations),
+                "total_evaluators": len(self.configs),
+                "evaluations_performed": sum(len(er) for er in evaluation_results.values())
+            }
+        }
+    
+    def _evaluate_single_translation(self, evaluator_id: str, source_lang: str, target_lang: str,
+                                   source_text: str, translation: str) -> Dict:
+        """使用单个评估模型评估翻译"""
+        config = self.configs[evaluator_id]
+        
+        try:
+            eval_prompt = get_evaluation_prompt(source_lang, target_lang, source_text, translation)
+            
+            request_data = {
+                'model': config['model'],
+                'messages': [{'role': 'user', 'content': eval_prompt}]
+            }
+            
+            logger.debug(f"Evaluator {evaluator_id} request: {json.dumps(request_data, ensure_ascii=False)}")
+            
+        except Exception as e:
+            logger.error(f"Error preparing evaluation request for {evaluator_id}: {e}")
+            return {
+                "success": False, 
+                "error": f"Error preparing request: {e}",
+                "evaluator_name": config['name']
+            }
+        
+        headers = {
+            'Content-Type': 'application/json', 
+            'Authorization': f'Bearer {config["api_key"]}'
+        }
+        
+        try:
+            response = requests.post(
+                config['api_url'], 
+                headers=headers, 
+                data=json.dumps(request_data), 
+                timeout=60
+            )
+            response.raise_for_status()
+            eval_data = response.json()
+            
+            if "choices" in eval_data and eval_data["choices"]:
+                eval_result_str = eval_data["choices"][0]["message"]["content"].strip()
+                
+                # 解析评分和理由
+                score = "N/A"
+                justification = "No justification provided."
+                
+                lines = eval_result_str.split('\n')
+                for line in lines:
+                    line = line.strip()
+                    if line.startswith("SCORE:"):
+                        try:
+                            score = int(line.split("SCORE:")[1].strip())
+                        except (ValueError, IndexError):
+                            logger.warning(f"Failed to parse score from line: {line}")
+                            score = "N/A"
+                    elif line.startswith("JUSTIFICATION:"):
+                        justification = line.split("JUSTIFICATION:")[1].strip()
+                
+                return {
+                    "success": True, 
+                    "score": score, 
+                    "justification": justification,
+                    "evaluator_name": config['name'],
+                    "evaluator_id": evaluator_id
+                }
+            else:
+                return {
+                    "success": False, 
+                    "error": "Invalid evaluation response",
+                    "evaluator_name": config['name'],
+                    "evaluator_id": evaluator_id
+                }
+                
+        except requests.exceptions.RequestException as e:
+            return {
+                "success": False, 
+                "error": str(e),
+                "evaluator_name": config['name'],
+                "evaluator_id": evaluator_id
+            }
+        except Exception as e:
+            return {
+                "success": False, 
+                "error": str(e),
+                "evaluator_name": config['name'],
+                "evaluator_id": evaluator_id
+            }
+    
+    def _combine_justifications(self, justifications: List[str]) -> str:
+        """合并多个评估理由"""
+        if not justifications:
+            return "No justifications available."
+        
+        if len(justifications) == 1:
+            return justifications[0]
+        
+        combined = []
+        for i, justification in enumerate(justifications, 1):
+            if justification.strip():
+                combined.append(f"Judge {i}: {justification.strip()}")
+        
+        return "\n\n".join(combined) if combined else "No justifications available." 

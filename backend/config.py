@@ -38,11 +38,11 @@ def get_translation_config():
 
 # Multi-model translation configuration
 def get_multi_translation_configs():
-    """获取多个翻译API配置，最多支持6个模型"""
+    """获取多个翻译API配置，最多支持9个模型"""
     configs = {}
     
-    # Load up to 6 model configurations
-    for i in range(1, 7):
+    # Load up to 9 model configurations
+    for i in range(1, 9):
         api_key = os.environ.get(f'TRANSLATION_API_KEY_{i}')
         api_url = os.environ.get(f'TRANSLATION_API_URL_{i}')
         model = os.environ.get(f'TRANSLATION_MODEL_{i}')
@@ -89,6 +89,38 @@ def get_evaluation_config():
         'api_url': os.environ.get('EVALUATION_API_URL'),
         'model': os.environ.get('EVALUATION_MODEL')
     }
+
+# Multi-evaluator configuration
+def get_multi_evaluation_configs():
+    """获取多个评估API配置，最多支持2个评估模型"""
+    configs = {}
+    
+    # Primary evaluator (backward compatible)
+    primary_config = get_evaluation_config()
+    if primary_config['api_key'] and primary_config['api_url'] and primary_config['model']:
+        display_name = os.environ.get('EVALUATION_MODEL_NAME', primary_config['model'])
+        configs['evaluator_1'] = {
+            'id': 'evaluator_1',
+            'name': display_name,
+            **primary_config
+        }
+    
+    # Secondary evaluator
+    api_key_2 = os.environ.get('EVALUATION_API_KEY_2')
+    api_url_2 = os.environ.get('EVALUATION_API_URL_2')
+    model_2 = os.environ.get('EVALUATION_MODEL_2')
+    
+    if api_key_2 and api_url_2 and model_2:
+        display_name_2 = os.environ.get('EVALUATION_MODEL_NAME_2', model_2)
+        configs['evaluator_2'] = {
+            'id': 'evaluator_2',
+            'name': display_name_2,
+            'api_key': api_key_2,
+            'api_url': api_url_2,
+            'model': model_2
+        }
+    
+    return configs
 
 # MiniMax TTS configuration
 def get_tts_config():
