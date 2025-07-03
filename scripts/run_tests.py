@@ -50,6 +50,20 @@ def run_tts_tests():
     
     return result.wasSuccessful()
 
+def run_multi_model_tests():
+    """只运行多模型翻译测试"""
+    print("🤖 Running Multi-Model Translation Tests...")
+    print("-" * 40)
+    
+    # Import and run multi-model tests specifically
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromName('tests.test_multi_model_service')
+    
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    
+    return result.wasSuccessful()
+
 def test_encoding_fix():
     """测试编码修复"""
     print("🔧 Testing encoding fix...")
@@ -84,6 +98,7 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='Run tests for Translation Evaluation Tool')
     parser.add_argument('--tts-only', action='store_true', help='Run only TTS tests')
+    parser.add_argument('--multi-model-only', action='store_true', help='Run only multi-model translation tests')
     parser.add_argument('--encoding-only', action='store_true', help='Run only encoding tests')
     
     args = parser.parse_args()
@@ -94,6 +109,8 @@ if __name__ == '__main__':
         success = test_encoding_fix()
     elif args.tts_only:
         success = run_tts_tests()
+    elif args.multi_model_only:
+        success = run_multi_model_tests()
     else:
         # Run encoding test first
         if not test_encoding_fix():

@@ -18,11 +18,26 @@ Below are some key UI pages to give you a quick feel of the Translation Evaluati
 
 - 🌐 **Multilingual Translation (AI LLM-based)**: Translate between major languages using state-of-the-art LLMs
 - 🤖 **Automatic Language Detection**
+- ⚖️ **Multi-Model Translation Comparison**: Compare translations from up to 6 different AI models side-by-side
 - 🚀 **Batch Translation & Evaluation**: Process multiple texts concurrently with intelligent queuing and progress tracking
 - 📊 **AI-powered Evaluation (LLM-based)**: Semantic accuracy, BLEU, fluency, and overall score
 - 🎵 **Text-to-Speech (TTS)**: MiniMax T2A V2 API integration
 - 🖥️ **Modern Web UI**: Playground, file upload, history, and statistics
 - 📦 **API-first Design**: Easy integration for developers
+
+### Multi-Model Comparison Features
+
+- **Side-by-Side Comparison**: Compare outputs from 2-6 AI models simultaneously
+- **Parallel Processing**: All models translate concurrently for optimal performance
+- **Model Selection**: Choose from configured models with user-friendly names
+- **Error Handling**: Failed translations are clearly marked while successful ones are displayed
+- **Easy Copy**: One-click copying of translation results
+- **Responsive Design**: Optimized for various screen sizes
+
+### Multi-Model Comparison Usage
+1. Set up the environment variables in `.env` file according to [MULTI_MODEL_CONFIG.md](docs/MULTI_MODEL_CONFIG.md)
+2. Run the app: `python run_app.py`
+3. Open your browser at [http://127.0.0.1:8888](http://127.0.0.1:8888)
 
 ### Batch Processing Features
 
@@ -109,7 +124,7 @@ Open your browser at [http://127.0.0.1:8888](http://127.0.0.1:8888)
 
 ## API Overview
 
-See [API_DOCS.md](API_DOCS.md) for full details.
+See [API_DOCS.md](docs/API_DOCS.md) for full details.
 
 - `POST /api/translate` — Translate text (AI LLM)
 - `POST /api/evaluate` — Evaluate translation (AI LLM)

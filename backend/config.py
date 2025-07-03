@@ -21,7 +21,7 @@ LANGUAGES = {
 # Default version tag (can be overridden via env)
 DEFAULT_VERSION = os.environ.get("RESULT_VERSION", "v1")
 
-# Translation API configuration
+# Translation API configuration (single model, backward compatible)
 def get_translation_config():
     """获取翻译API配置"""
     return {
@@ -35,6 +35,51 @@ def get_translation_config():
         'num_beams': int(os.environ.get('TRANSLATION_NUM_BEAMS', '1')),
         'do_sample': os.environ.get('TRANSLATION_DO_SAMPLE', 'false').lower() == 'true'
     }
+
+# Multi-model translation configuration
+def get_multi_translation_configs():
+    """获取多个翻译API配置，最多支持6个模型"""
+    configs = {}
+    
+    # Load up to 6 model configurations
+    for i in range(1, 7):
+        api_key = os.environ.get(f'TRANSLATION_API_KEY_{i}')
+        api_url = os.environ.get(f'TRANSLATION_API_URL_{i}')
+        model = os.environ.get(f'TRANSLATION_MODEL_{i}')
+        model_name = os.environ.get(f'TRANSLATION_MODEL_NAME_{i}')
+        
+        # Skip if any required config is missing
+        if not all([api_key, api_url, model]):
+            continue
+            
+        # Use model name if provided, otherwise use model ID
+        display_name = model_name if model_name else model
+        
+        configs[f'model_{i}'] = {
+            'id': f'model_{i}',
+            'name': display_name,
+            'api_key': api_key,
+            'api_url': api_url,
+            'model': model,
+            'stream': os.environ.get(f'TRANSLATION_STREAM_{i}', 'true').lower() == 'true',
+            'temperature': float(os.environ.get(f'TRANSLATION_TEMPERATURE_{i}', '0.0')),
+            'max_length': int(os.environ.get(f'TRANSLATION_MAX_LENGTH_{i}', '16384')),
+            'top_p': float(os.environ.get(f'TRANSLATION_TOP_P_{i}', '1.0')),
+            'num_beams': int(os.environ.get(f'TRANSLATION_NUM_BEAMS_{i}', '1')),
+            'do_sample': os.environ.get(f'TRANSLATION_DO_SAMPLE_{i}', 'false').lower() == 'true'
+        }
+    
+    # Fallback to single model config if no multi-model configs found
+    if not configs:
+        single_config = get_translation_config()
+        if single_config['api_key'] and single_config['api_url'] and single_config['model']:
+            configs['model_1'] = {
+                'id': 'model_1',
+                'name': single_config['model'],
+                **single_config
+            }
+    
+    return configs
 
 # Evaluation API configuration
 def get_evaluation_config():

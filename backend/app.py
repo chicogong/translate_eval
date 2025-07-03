@@ -10,7 +10,7 @@ import threading
 
 from config import LANGUAGES, DEFAULT_VERSION, PROJECT_ROOT, FLASK_CONFIG
 from utils import setup_logging, format_run_id, validate_language_pair, detect_language
-from services import TranslationService, EvaluationService
+from services import TranslationService, EvaluationService, MultiModelTranslationService
 from batch import run_batch_translation, run_batch_evaluation, run_live_translation_and_evaluation
 from examples import EXAMPLES
 from tts_service import TTSService
@@ -31,6 +31,7 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 # Initialize services
 translation_service = TranslationService()
 evaluation_service = EvaluationService()
+multi_model_service = MultiModelTranslationService()
 tts_service = TTSService()
 
 @app.route('/')
@@ -116,6 +117,77 @@ def api_evaluate():
 def batch_index():
     """Render batch evaluation dashboard."""
     return render_template('batch.html', languages=LANGUAGES)
+
+@app.route('/compare')
+def compare_index():
+    """Render multi-model comparison page."""
+    return render_template('compare.html', languages=LANGUAGES)
+
+@app.route('/api/models', methods=['GET'])
+def api_get_models():
+    """Get available translation models"""
+    try:
+        models = multi_model_service.get_available_models()
+        return jsonify({"success": True, "models": models})
+    except Exception as e:
+        logger.error(f"Error getting models: {e}")
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/translate/compare', methods=['POST'])
+def api_compare_translate():
+    """API endpoint for multi-model translation comparison"""
+    data = request.get_json()
+    source_lang = data.get('source_lang') or 'auto'
+    target_lang = data.get('target_lang') or 'en'
+    text = data.get('text', '').strip()
+    model_ids = data.get('model_ids', [])
+    
+    # Optional parameters
+    stream = data.get('stream')
+    temperature = data.get('temperature')
+    max_length = data.get('max_length')
+    top_p = data.get('top_p')
+    
+    logger.info(f"Multi-model translation API called: {source_lang} -> {target_lang}, models: {model_ids}")
+    
+    # Auto detect language if needed
+    if source_lang in ['auto', '', None]:
+        source_lang = detect_language(text)
+        logger.info(f"Auto-detected source language: {source_lang}")
+    
+    # Validate required parameters
+    if not text:
+        logger.warning("Missing text in multi-model translation request")
+        return jsonify({"success": False, "error": "Text is required"})
+    
+    if not model_ids or len(model_ids) == 0:
+        logger.warning("No model IDs provided")
+        return jsonify({"success": False, "error": "At least one model ID is required"})
+    
+    if len(model_ids) > 6:
+        logger.warning("Too many model IDs provided")
+        return jsonify({"success": False, "error": "Maximum 6 models are supported"})
+    
+    # Validate language pair
+    is_valid, error_msg = validate_language_pair(source_lang, target_lang)
+    if not is_valid:
+        logger.warning(f"Invalid language pair: {error_msg}")
+        return jsonify({"success": False, "error": error_msg})
+    
+    # Call multi-model translation service
+    result = multi_model_service.translate_with_multiple_models(
+        source_lang=source_lang,
+        target_lang=target_lang,
+        text=text,
+        model_ids=model_ids,
+        stream=stream,
+        temperature=temperature,
+        max_length=max_length,
+        top_p=top_p
+    )
+    
+    logger.info(f"Multi-model translation result: success={result['success']}")
+    return jsonify(result)
 
 @app.route('/api/examples')
 def api_examples():
