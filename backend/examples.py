@@ -370,5 +370,633 @@ EXAMPLES = {
                 "완전 인정이야."
             ]
         }
+    ],
+    'fr': [
+        {
+            "label": "Faux Amis",
+            "texts": [
+                "Je suis actuellement en train de lire.",
+                "J'assiste à la réunion demain.",
+                "Il est très sensible aux critiques.",
+                "Le grand magasin est fermé.",
+                "Je préserve mes traditions familiales."
+            ]
+        },
+        {
+            "label": "Expressions Idiomatiques",
+            "texts": [
+                "Il pleut comme vache qui pisse.",
+                "C'est un coup d'épée dans l'eau.",
+                "Il faut tourner sa langue sept fois.",
+                "J'ai d'autres chats à fouetter.",
+                "Il tombe des cordes aujourd'hui."
+            ]
+        },
+        {
+            "label": "Subjonctif",
+            "texts": [
+                "Il faut que vous fassiez attention.",
+                "Je doute qu'il puisse venir.",
+                "Bien qu'il soit tard, je continue.",
+                "Je veux que tu comprennes cela.",
+                "Il est possible qu'elle parte."
+            ]
+        },
+        {
+            "label": "Références Culturelles",
+            "texts": [
+                "Il est fort comme un Turc.",
+                "C'est l'hôpital qui se moque de la charité.",
+                "Il découvre l'Amérique.",
+                "C'est son talon d'Achille.",
+                "Il fait un travail de Romain."
+            ]
+        },
+        {
+            "label": "Registre Familier",
+            "texts": [
+                "J'en ai marre de cette histoire.",
+                "Il est complètement zinzin.",
+                "T'es sûr que ça va marcher?",
+                "C'est du grand n'importe quoi.",
+                "Il s'est fait avoir comme un bleu."
+            ]
+        }
+    ],
+    'de': [
+        {
+            "label": "Falsche Freunde",
+            "texts": [
+                "Ich bin aktuell sehr beschäftigt.",
+                "Das ist eine sensible Angelegenheit.",
+                "Er hat ein Handy gekauft.",
+                "Ich bekomme einen Kaffee.",
+                "Das ist ein präziser Mechanismus."
+            ]
+        },
+        {
+            "label": "Redewendungen",
+            "texts": [
+                "Es regnet Bindfäden.",
+                "Da liegt der Hund begraben.",
+                "Das ist nicht mein Bier.",
+                "Er hat Tomaten auf den Augen.",
+                "Das ist ein Buch mit sieben Siegeln."
+            ]
+        },
+        {
+            "label": "Konjunktiv",
+            "texts": [
+                "Wenn ich Zeit hätte, würde ich kommen.",
+                "Er sagte, er sei müde.",
+                "Wäre ich reich, kaufte ich ein Haus.",
+                "Sie fragte, ob er da wäre.",
+                "Hätte ich das gewusst!"
+            ]
+        },
+        {
+            "label": "Trennbare Verben",
+            "texts": [
+                "Ich stehe um sieben Uhr auf.",
+                "Wir gehen heute aus.",
+                "Er gibt das Rauchen auf.",
+                "Sie macht das Licht an.",
+                "Ich komme nicht mit."
+            ]
+        },
+        {
+            "label": "Umgangssprache",
+            "texts": [
+                "Das ist echt krass!",
+                "Ich hab' null Bock darauf.",
+                "Das ist voll cool.",
+                "Mensch, das ist hammer!",
+                "Das ist total ätzend."
+            ]
+        }
+    ],
+    'it': [
+        {
+            "label": "Falsi Amici",
+            "texts": [
+                "Attualmente sto studiando italiano.",
+                "Lui è molto sensibile alla musica.",
+                "La fabbrica produce automobili.",
+                "Questo argomento è molto delicato.",
+                "Ho fatto una confusione terribile."
+            ]
+        },
+        {
+            "label": "Modi di Dire",
+            "texts": [
+                "Piove a catinelle.",
+                "In bocca al lupo per l'esame!",
+                "Hai voluto la bicicletta? Ora pedala!",
+                "Non c'è trippa per gatti.",
+                "Meglio un uovo oggi che una gallina domani."
+            ]
+        },
+        {
+            "label": "Congiuntivo",
+            "texts": [
+                "Penso che sia una buona idea.",
+                "Spero che tu possa venire.",
+                "Benché sia tardi, continuo a lavorare.",
+                "Non credo che lui capisca.",
+                "È possibile che piova domani."
+            ]
+        },
+        {
+            "label": "Preposizioni",
+            "texts": [
+                "Vado a Roma in treno.",
+                "Penso di partire domani.",
+                "Sono nato nel 1985.",
+                "Studio l'italiano da tre anni.",
+                "Lavoro dalle nove alle cinque."
+            ]
+        },
+        {
+            "label": "Linguaggio Colloquiale",
+            "texts": [
+                "Che figata questo posto!",
+                "Sono proprio sfigato oggi.",
+                "Non me ne frega niente.",
+                "Che pizza questa lezione!",
+                "Dai, non fare lo gnorri!"
+            ]
+        }
+    ],
+    'ru': [
+        {
+            "label": "Ложные друзья",
+            "texts": [
+                "Я актуально изучаю русский язык.",
+                "Он очень деликатный человек.",
+                "Это очень сенсибельная тема.",
+                "Я претендую на эту должность.",
+                "Фабрика производит автомобили."
+            ]
+        },
+        {
+            "label": "Идиомы и поговорки",
+            "texts": [
+                "Дождь как из ведра.",
+                "Не в бровь, а в глаз.",
+                "Работать спустя рукава.",
+                "Вешать лапшу на уши.",
+                "Собаку съел на этом деле."
+            ]
+        },
+        {
+            "label": "Падежи",
+            "texts": [
+                "Я читаю интересную книгу.",
+                "Он дарит подарок маме.",
+                "Мы идём в театр с друзьями.",
+                "Студенты изучают русский язык.",
+                "Дети играют в парке."
+            ]
+        },
+        {
+            "label": "Глаголы движения",
+            "texts": [
+                "Я еду в Москву на поезде.",
+                "Он часто ездит к бабушке.",
+                "Мы идём в магазин пешком.",
+                "Самолёт летит над облаками.",
+                "Корабль плывёт по морю."
+            ]
+        },
+        {
+            "label": "Разговорная речь",
+            "texts": [
+                "Это полный абзац!",
+                "Не грузи меня этим.",
+                "Тебе крышу снесло?",
+                "Это просто зачёт!",
+                "Не парься из-за ерунды."
+            ]
+        }
+    ],
+    'nl': [
+        {
+            "label": "Valse Vrienden",
+            "texts": [
+                "Ik ben actueel bezig met studeren.",
+                "Hij is een sensibele persoon.",
+                "Dit is een delicate situatie.",
+                "Ik preserveer mijn tradities.",
+                "De fabriek produceert auto's."
+            ]
+        },
+        {
+            "label": "Uitdrukkingen",
+            "texts": [
+                "Het regent pijpenstelen.",
+                "Dat slaat als een tang op een varken.",
+                "Nu komt de aap uit de mouw.",
+                "Hij heeft er geen kaas van gegeten.",
+                "Zij heeft haar boterham niet op de zure manier verdiend."
+            ]
+        },
+        {
+            "label": "Moeilijke Grammatica",
+            "texts": [
+                "Als ik tijd had gehad, was ik gekomen.",
+                "Ik twijfel eraan of hij komt.",
+                "Hoewel het regent, ga ik toch.",
+                "Het is mogelijk dat hij later komt.",
+                "Ik zou graag willen dat je komt."
+            ]
+        },
+        {
+            "label": "Informeel Taalgebruik",
+            "texts": [
+                "Dat is echt te gek!",
+                "Ik heb er geen zin in.",
+                "Wat een toffe gast!",
+                "Dat is hartstikke cool.",
+                "Ik snap er niks van."
+            ]
+        }
+    ],
+    'sv': [
+        {
+            "label": "Falska Vänner",
+            "texts": [
+                "Jag är aktuell med mina studier.",
+                "Han är en sensibel person.",
+                "Det här är en delikat situation.",
+                "Jag preserverar mina traditioner.",
+                "Fabriken producerar bilar."
+            ]
+        },
+        {
+            "label": "Idiom och Uttryck",
+            "texts": [
+                "Det regnar som spön i backen.",
+                "Att kasta pärlor för svin.",
+                "Nu är det kokat.",
+                "Han har inte rent mjöl i påsen.",
+                "Att sälja skinnet innan björnen är skjuten."
+            ]
+        },
+        {
+            "label": "Svår Grammatik",
+            "texts": [
+                "Om jag hade haft tid, skulle jag ha kommit.",
+                "Jag tvivlar på att han kommer.",
+                "Trots att det regnar, går jag ut.",
+                "Det är möjligt att han kommer senare.",
+                "Jag skulle vilja att du kommer."
+            ]
+        },
+        {
+            "label": "Vardagsspråk",
+            "texts": [
+                "Det är helt sjukt!",
+                "Jag orkar inte med det här.",
+                "Vilken schysst kille!",
+                "Det är så coolt.",
+                "Jag fattar ingenting."
+            ]
+        }
+    ],
+    'no': [
+        {
+            "label": "Falske Venner",
+            "texts": [
+                "Jeg er aktuell med studiene mine.",
+                "Han er en sensibel person.",
+                "Dette er en delikat situasjon.",
+                "Jeg preserverer tradisjonene mine.",
+                "Fabrikken produserer biler."
+            ]
+        },
+        {
+            "label": "Idiomer og Uttrykk",
+            "texts": [
+                "Det regner som spann i taket.",
+                "Å kaste perler for svin.",
+                "Nå er det kjørt.",
+                "Han har ikke rent mel i posen.",
+                "Å selge skinnet før bjørnen er skutt."
+            ]
+        },
+        {
+            "label": "Vanskelig Grammatikk",
+            "texts": [
+                "Hvis jeg hadde hatt tid, ville jeg ha kommet.",
+                "Jeg tviler på at han kommer.",
+                "Selv om det regner, går jeg ut.",
+                "Det er mulig at han kommer senere.",
+                "Jeg skulle ønske at du kommer."
+            ]
+        },
+        {
+            "label": "Dagligspråk",
+            "texts": [
+                "Det er helt sykt!",
+                "Jeg gidder ikke dette.",
+                "Så kul fyr!",
+                "Det er så kult.",
+                "Jeg skjønner ingenting."
+            ]
+        }
+    ],
+    'da': [
+        {
+            "label": "Falske Venner",
+            "texts": [
+                "Jeg er aktuel med mine studier.",
+                "Han er en sensibel person.",
+                "Dette er en delikat situation.",
+                "Jeg preserverer mine traditioner.",
+                "Fabrikken producerer biler."
+            ]
+        },
+        {
+            "label": "Idiomer og Udtryk",
+            "texts": [
+                "Det regner skomagerdrenge.",
+                "At kaste perler for svin.",
+                "Nu er den gal.",
+                "Han har ikke rent mel i posen.",
+                "At sælge skindet før bjørnen er skudt."
+            ]
+        },
+        {
+            "label": "Svær Grammatik",
+            "texts": [
+                "Hvis jeg havde haft tid, ville jeg være kommet.",
+                "Jeg tvivler på, at han kommer.",
+                "Selvom det regner, går jeg ud.",
+                "Det er muligt, at han kommer senere.",
+                "Jeg ville ønske, at du kommer."
+            ]
+        },
+        {
+            "label": "Dagligsprog",
+            "texts": [
+                "Det er helt sygt!",
+                "Jeg gider ikke det her.",
+                "Så fed fyr!",
+                "Det er så fedt.",
+                "Jeg forstår ingenting."
+            ]
+        }
+    ],
+    'fi': [
+        {
+            "label": "Väärät Ystävät",
+            "texts": [
+                "Olen aktuaalisesti opiskelemassa.",
+                "Hän on sensitiivinen henkilö.",
+                "Tämä on delikaatti tilanne.",
+                "Säilytän perinteitäni.",
+                "Tehdas tuottaa autoja."
+            ]
+        },
+        {
+            "label": "Idiomit ja Sananlaskut",
+            "texts": [
+                "Sataa kuin Esterin perseestä.",
+                "Heittää helmiä sikojen eteen.",
+                "Nyt on kusi nousemassa päähän.",
+                "Hänellä ei ole puhdasta jauhoa säkissä.",
+                "Myydä nahka ennen kuin karhu on tapettu."
+            ]
+        },
+        {
+            "label": "Vaikea Kielioppi",
+            "texts": [
+                "Jos minulla olisi ollut aikaa, olisin tullut.",
+                "Epäilen, että hän tulee.",
+                "Vaikka sataa, menen ulos.",
+                "On mahdollista, että hän tulee myöhemmin.",
+                "Toivoisin, että tulisit."
+            ]
+        },
+        {
+            "label": "Puhekieli",
+            "texts": [
+                "Se on ihan sika hyvä!",
+                "Mä en jaksa tätä.",
+                "Mikä cool jätkä!",
+                "Se on tosi cool.",
+                "Mä en ymmärrä mitään."
+            ]
+        }
+    ],
+    'pl': [
+        {
+            "label": "Fałszywi Przyjaciele",
+            "texts": [
+                "Jestem aktualny z moimi studiami.",
+                "On jest bardzo sensytywnym człowiekiem.",
+                "To jest delikatna sytuacja.",
+                "Prezerwa moje tradycje.",
+                "Fabryka produkuje samochody."
+            ]
+        },
+        {
+            "label": "Idiomy i Przysłowia",
+            "texts": [
+                "Leje jak z cebra.",
+                "Rzucać perły przed wieprze.",
+                "Teraz jest klapa.",
+                "Nie ma czystej mąki w worku.",
+                "Sprzedawać skórę na niedźwiedziu."
+            ]
+        },
+        {
+            "label": "Trudna Gramatyka",
+            "texts": [
+                "Gdybym miał czas, przyszedłbym.",
+                "Wątpię, czy on przyjdzie.",
+                "Chociaż pada, wychodzę.",
+                "Możliwe, że przyjdzie później.",
+                "Chciałbym, żebyś przyszedł."
+            ]
+        },
+        {
+            "label": "Język Potoczny",
+            "texts": [
+                "To jest mega fajne!",
+                "Nie mam na to ochoty.",
+                "Jaki spoko gość!",
+                "To jest super cool.",
+                "Nic nie rozumiem."
+            ]
+        }
+    ],
+    'cs': [
+        {
+            "label": "Falešní Přátelé",
+            "texts": [
+                "Jsem aktuální se svými studiemi.",
+                "On je velmi senzitivní člověk.",
+                "Toto je delikátní situace.",
+                "Zachovávám svoje tradice.",
+                "Továrna vyrábí automobily."
+            ]
+        },
+        {
+            "label": "Idiomy a Přísloví",
+            "texts": [
+                "Prší jako z konve.",
+                "Házet perly sviním.",
+                "Teď je to v háji.",
+                "Nemá čistou mouku v pytli.",
+                "Prodávat kůži na medvědovi."
+            ]
+        },
+        {
+            "label": "Těžká Gramatika",
+            "texts": [
+                "Kdybych měl čas, přišel bych.",
+                "Pochybuji, že přijde.",
+                "Přestože prší, jdu ven.",
+                "Je možné, že přijde později.",
+                "Přál bych si, abys přišel."
+            ]
+        },
+        {
+            "label": "Hovorová Čeština",
+            "texts": [
+                "To je mega super!",
+                "Nemám na to náladu.",
+                "Jakej cool kluk!",
+                "To je tak super.",
+                "Nic nechápu."
+            ]
+        }
+    ],
+    'hu': [
+        {
+            "label": "Hamis Barátok",
+            "texts": [
+                "Aktuálisan tanulok a vizsgámra.",
+                "Ő egy érzékeny ember.",
+                "Ez egy delikát helyzet.",
+                "Megőrzöm a hagyományaimat.",
+                "A gyár autókat gyárt."
+            ]
+        },
+        {
+            "label": "Idiómák és Közmondások",
+            "texts": [
+                "Úgy esik, mint a záporeső.",
+                "Gyöngyöt hint a disznók elé.",
+                "Most van szörnyű.",
+                "Nincs tiszta liszt a zsákjában.",
+                "Eladja a bőrt a medve előtt."
+            ]
+        },
+        {
+            "label": "Nehéz Nyelvtan",
+            "texts": [
+                "Ha lett volna időm, eljöttem volna.",
+                "Kétlem, hogy eljön.",
+                "Bár esik, kimegyek.",
+                "Lehetséges, hogy később jön.",
+                "Szeretném, ha eljönnél."
+            ]
+        },
+        {
+            "label": "Beszélt Nyelv",
+            "texts": [
+                "Ez nagyon menő!",
+                "Nincs kedvem hozzá.",
+                "Milyen klassz srác!",
+                "Ez annyira cool.",
+                "Semmit sem értek."
+            ]
+        }
+    ],
+    'tr': [
+        {
+            "label": "Yanlış Dostlar",
+            "texts": [
+                "Aktüel olarak ders çalışıyorum.",
+                "O çok hassas bir insan.",
+                "Bu narin bir durum.",
+                "Geleneklerimi koruyorum.",
+                "Fabrika araba üretiyor."
+            ]
+        },
+        {
+            "label": "Deyimler ve Atasözleri",
+            "texts": [
+                "Bardaktan boşanırcasına yağıyor.",
+                "Domuzlara inci atmak.",
+                "Şimdi iş bozuldu.",
+                "Çuvalında temiz un yok.",
+                "Daha ayıyı öldürmeden derisini satmak."
+            ]
+        },
+        {
+            "label": "Zor Dilbilgisi",
+            "texts": [
+                "Zamanım olsaydı gelirdim.",
+                "Geleceğinden şüphe ediyorum.",
+                "Yağmur yağmasına rağmen çıkıyorum.",
+                "Sonra gelebilir.",
+                "Gelmen için dua ediyorum."
+            ]
+        },
+        {
+            "label": "Konuşma Dili",
+            "texts": [
+                "Bu çok harika!",
+                "Bunun için canım yok.",
+                "Ne kadar cool bir adam!",
+                "Bu çok havalı.",
+                "Hiçbir şey anlamıyorum."
+            ]
+        }
+    ],
+    'ar': [
+        {
+            "label": "الأصدقاء الكاذبون",
+            "texts": [
+                "أنا حالياً أدرس للامتحان.",
+                "هو شخص حساس جداً.",
+                "هذا موقف رقيق.",
+                "أحافظ على تقاليدي.",
+                "المصنع ينتج السيارات."
+            ]
+        },
+        {
+            "label": "التعبيرات الاصطلاحية",
+            "texts": [
+                "تمطر قطط وكلاب.",
+                "يلقي اللؤلؤ أمام الخنازير.",
+                "الآن الأمور صعبة.",
+                "ليس لديه دقيق نظيف في الكيس.",
+                "يبيع الجلد قبل قتل الدب."
+            ]
+        },
+        {
+            "label": "النحو الصعب",
+            "texts": [
+                "لو كان لدي وقت، لكنت جئت.",
+                "أشك في أنه سيأتي.",
+                "رغم أنه يمطر، سأخرج.",
+                "من المحتمل أن يأتي لاحقاً.",
+                "أتمنى لو تأتي."
+            ]
+        },
+        {
+            "label": "اللغة العامية",
+            "texts": [
+                "هذا رائع جداً!",
+                "ليس لدي مزاج لهذا.",
+                "يا له من شاب رائع!",
+                "هذا رائع جداً.",
+                "لا أفهم شيئاً."
+            ]
+        }
     ]
 } 

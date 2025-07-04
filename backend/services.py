@@ -5,9 +5,14 @@ Translation and Evaluation Services
 import json
 import requests
 import logging
+import time
 from typing import Dict, Generator, Optional, List
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from config import get_translation_config, get_evaluation_config, get_multi_translation_configs, get_multi_evaluation_configs
+from config import (
+    get_translation_config, get_evaluation_config, 
+    get_multi_translation_configs, get_multi_evaluation_configs,
+    API_CONFIG, RESPONSE_CONFIG
+)
 from prompts import get_translation_prompt, get_evaluation_prompt
 from hunyuan_service import HunyuanTranslationService
 
@@ -23,6 +28,7 @@ class TranslationService:
                       stream: Optional[bool] = None, temperature: Optional[float] = None,
                       max_length: Optional[int] = None, top_p: Optional[float] = None) -> dict:
         """翻译文本，支持流式和非流式"""
+        start_time = time.time()
         logger.info(f"Starting translation: {source_lang} -> {target_lang}, text length: {len(text)}")
         
         if not self.config['api_key']:
@@ -64,30 +70,38 @@ class TranslationService:
         
         # 根据是否流式选择不同的处理方式
         if use_stream:
-            return self._translate_stream(request_data)
+            result = self._translate_stream(request_data)
         else:
-            return self._translate_non_stream(request_data)
+            result = self._translate_non_stream(request_data)
+        
+        # 添加TTFT统计
+        if result.get('success'):
+            total_time_ms = int((time.time() - start_time) * 1000)
+            result['ttft_ms'] = total_time_ms
+            logger.info(f"Translation completed in {total_time_ms}ms")
+        
+        return result
     
     def _translate_non_stream(self, request_data: dict) -> dict:
         """非流式翻译"""
         headers = {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.config["api_key"]}'
         }
         
         try:
-            logger.debug(f"Making non-stream translation API call to {self.config['api_url']}")
+            logger.info(f"Translation API Request: {self.config['api_url']} | Data: {json.dumps(request_data, ensure_ascii=False)}")
+            
             response = requests.post(
                 self.config['api_url'], 
                 headers=headers, 
                 data=json.dumps(request_data), 
-                timeout=60
+                timeout=API_CONFIG['timeout']
             )
             response.raise_for_status()
             response_data = response.json()
             
-            # 记录完整的响应内容
-            logger.info(f"Translation response data: {json.dumps(response_data, ensure_ascii=False, indent=2)}")
+            logger.info(f"Translation API Response: {json.dumps(response_data, ensure_ascii=False)}")
             
             if "choices" in response_data and response_data["choices"]:
                 translation = response_data["choices"][0]["message"]["content"]
@@ -99,25 +113,26 @@ class TranslationService:
                 
         except requests.exceptions.RequestException as e:
             logger.error(f"Translation API request failed: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": f"API request failed: {e}"}
         except Exception as e:
             logger.error(f"Unexpected error during translation: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": f"Unexpected error: {e}"}
     
     def _translate_stream(self, request_data: dict) -> dict:
         """流式翻译"""
         headers = {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.config["api_key"]}'
         }
         
         try:
-            logger.debug(f"Making stream translation API call to {self.config['api_url']}")
+            logger.info(f"Stream Translation API Request: {self.config['api_url']} | Data: {json.dumps(request_data, ensure_ascii=False)}")
+            
             response = requests.post(
                 self.config['api_url'], 
                 headers=headers, 
                 data=json.dumps(request_data), 
-                timeout=60,
+                timeout=API_CONFIG['timeout'],
                 stream=True
             )
             response.raise_for_status()
@@ -172,7 +187,7 @@ class TranslationService:
             return self._translate_non_stream({k: v for k, v in request_data.items() if k != 'stream'})
         except Exception as e:
             logger.error(f"Unexpected error during stream translation: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": f"Unexpected error: {e}"}
 
 
 class EvaluationService:
@@ -207,43 +222,43 @@ class EvaluationService:
             return {"success": False, "error": f"Error preparing evaluation request: {e}"}
         
         headers = {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.config["api_key"]}'
         }
         
         try:
-            logger.debug(f"Making evaluation API call to {self.config['api_url']}")
+            logger.info(f"Evaluation API Request: {self.config['api_url']} | Data: {json.dumps(request_data, ensure_ascii=False)}")
+            
             response = requests.post(
                 self.config['api_url'], 
                 headers=headers, 
                 data=json.dumps(request_data), 
-                timeout=60
+                timeout=API_CONFIG['timeout']
             )
             response.raise_for_status()
             eval_data = response.json()
             
-            # 记录完整的响应内容
-            logger.info(f"Evaluation response data: {json.dumps(eval_data, ensure_ascii=False, indent=2)}")
+            logger.info(f"Evaluation API Response: {json.dumps(eval_data, ensure_ascii=False)}")
             
             if "choices" in eval_data and eval_data["choices"]:
                 eval_result_str = eval_data["choices"][0]["message"]["content"].strip()
                 
                 # 解析评分和理由
-                score = "N/A"
-                justification = "No justification provided."
+                score = RESPONSE_CONFIG['default_score']
+                justification = RESPONSE_CONFIG['default_justification']
                 
                 lines = eval_result_str.split('\n')
                 for line in lines:
                     line = line.strip()
-                    if line.startswith("SCORE:"):
+                    if line.startswith(RESPONSE_CONFIG['score_prefix']):
                         try:
-                            score = int(line.split("SCORE:")[1].strip())
+                            score = int(line.split(RESPONSE_CONFIG['score_prefix'])[1].strip())
                             logger.debug(f"Parsed evaluation score: {score}")
                         except (ValueError, IndexError):
                             logger.warning(f"Failed to parse score from line: {line}")
-                            score = "N/A"
-                    elif line.startswith("JUSTIFICATION:"):
-                        justification = line.split("JUSTIFICATION:")[1].strip()
+                            score = RESPONSE_CONFIG['default_score']
+                    elif line.startswith(RESPONSE_CONFIG['justification_prefix']):
+                        justification = line.split(RESPONSE_CONFIG['justification_prefix'])[1].strip()
                         logger.debug(f"Parsed justification length: {len(justification)}")
                 
                 logger.info(f"Evaluation successful, score: {score}")
@@ -254,10 +269,10 @@ class EvaluationService:
                 
         except requests.exceptions.RequestException as e:
             logger.error(f"Evaluation API request failed: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": f"API request failed: {e}"}
         except Exception as e:
             logger.error(f"Unexpected error during evaluation: {e}")
-            return {"success": False, "error": str(e)} 
+            return {"success": False, "error": f"Unexpected error: {e}"} 
 
 
 class MultiModelTranslationService:
@@ -299,7 +314,8 @@ class MultiModelTranslationService:
         
         # 并行翻译
         results = {}
-        with ThreadPoolExecutor(max_workers=len(valid_model_ids)) as executor:
+        max_workers = min(len(valid_model_ids), API_CONFIG['max_workers'])
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # 提交所有翻译任务
             future_to_model = {}
             for model_id in valid_model_ids:
@@ -373,7 +389,7 @@ class MultiModelTranslationService:
                 'do_sample': config['do_sample']
             }
             
-            logger.debug(f"Model {model_id} translation request: {json.dumps(request_data, ensure_ascii=False)}")
+            logger.info(f"Model {model_id} translation request: {json.dumps(request_data, ensure_ascii=False)}")
             
         except Exception as e:
             logger.error(f"Error preparing translation request for model {model_id}: {e}")
@@ -388,19 +404,23 @@ class MultiModelTranslationService:
     def _translate_non_stream_single_model(self, config: Dict, request_data: Dict) -> Dict:
         """单个模型非流式翻译"""
         headers = {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
             'Authorization': f'Bearer {config["api_key"]}'
         }
         
         try:
+            logger.info(f"Model {config['id']} API Request: {config['api_url']} | Data: {json.dumps(request_data, ensure_ascii=False)}")
+            
             response = requests.post(
                 config['api_url'], 
                 headers=headers, 
                 data=json.dumps(request_data), 
-                timeout=60
+                timeout=API_CONFIG['timeout']
             )
             response.raise_for_status()
             response_data = response.json()
+            
+            logger.info(f"Model {config['id']} API Response: {json.dumps(response_data, ensure_ascii=False)}")
             
             if "choices" in response_data and response_data["choices"]:
                 translation = response_data["choices"][0]["message"]["content"]
@@ -436,16 +456,18 @@ class MultiModelTranslationService:
     def _translate_stream_single_model(self, config: Dict, request_data: Dict) -> Dict:
         """单个模型流式翻译"""
         headers = {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
             'Authorization': f'Bearer {config["api_key"]}'
         }
         
         try:
+            logger.info(f"Model {config['id']} Stream API Request: {config['api_url']} | Data: {json.dumps(request_data, ensure_ascii=False)}")
+            
             response = requests.post(
                 config['api_url'], 
                 headers=headers, 
                 data=json.dumps(request_data), 
-                timeout=60,
+                timeout=API_CONFIG['timeout'],
                 stream=True
             )
             response.raise_for_status()
@@ -494,6 +516,7 @@ class MultiModelTranslationService:
             
         except requests.exceptions.RequestException as e:
             # fallback 到非流式
+            logger.warning(f"Stream request failed for model {config['name']}, falling back to non-stream")
             return self._translate_non_stream_single_model(config, {k: v for k, v in request_data.items() if k != 'stream'})
         except Exception as e:
             return {
@@ -538,7 +561,8 @@ class MultiEvaluationService:
         
         # 并行评估所有翻译结果
         evaluation_results = {}
-        with ThreadPoolExecutor(max_workers=len(self.configs) * len(successful_translations)) as executor:
+        max_workers = min(len(self.configs) * len(successful_translations), API_CONFIG['max_workers'])
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # 提交所有评估任务
             future_to_key = {}
             for translation_key, translation_result in successful_translations.items():
@@ -627,7 +651,7 @@ class MultiEvaluationService:
                 'messages': [{'role': 'user', 'content': eval_prompt}]
             }
             
-            logger.debug(f"Evaluator {evaluator_id} request: {json.dumps(request_data, ensure_ascii=False)}")
+            logger.info(f"Evaluator {evaluator_id} request: {json.dumps(request_data, ensure_ascii=False)}")
             
         except Exception as e:
             logger.error(f"Error preparing evaluation request for {evaluator_id}: {e}")
@@ -638,38 +662,42 @@ class MultiEvaluationService:
             }
         
         headers = {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
             'Authorization': f'Bearer {config["api_key"]}'
         }
         
         try:
+            logger.info(f"Evaluator {evaluator_id} API Request: {config['api_url']} | Data: {json.dumps(request_data, ensure_ascii=False)}")
+            
             response = requests.post(
                 config['api_url'], 
                 headers=headers, 
                 data=json.dumps(request_data), 
-                timeout=60
+                timeout=API_CONFIG['timeout']
             )
             response.raise_for_status()
             eval_data = response.json()
+            
+            logger.info(f"Evaluator {evaluator_id} API Response: {json.dumps(eval_data, ensure_ascii=False)}")
             
             if "choices" in eval_data and eval_data["choices"]:
                 eval_result_str = eval_data["choices"][0]["message"]["content"].strip()
                 
                 # 解析评分和理由
-                score = "N/A"
-                justification = "No justification provided."
+                score = RESPONSE_CONFIG['default_score']
+                justification = RESPONSE_CONFIG['default_justification']
                 
                 lines = eval_result_str.split('\n')
                 for line in lines:
                     line = line.strip()
-                    if line.startswith("SCORE:"):
+                    if line.startswith(RESPONSE_CONFIG['score_prefix']):
                         try:
-                            score = int(line.split("SCORE:")[1].strip())
+                            score = int(line.split(RESPONSE_CONFIG['score_prefix'])[1].strip())
                         except (ValueError, IndexError):
                             logger.warning(f"Failed to parse score from line: {line}")
-                            score = "N/A"
-                    elif line.startswith("JUSTIFICATION:"):
-                        justification = line.split("JUSTIFICATION:")[1].strip()
+                            score = RESPONSE_CONFIG['default_score']
+                    elif line.startswith(RESPONSE_CONFIG['justification_prefix']):
+                        justification = line.split(RESPONSE_CONFIG['justification_prefix'])[1].strip()
                 
                 return {
                     "success": True, 
@@ -704,7 +732,7 @@ class MultiEvaluationService:
     def _combine_justifications(self, justifications: List[str]) -> str:
         """合并多个评估理由"""
         if not justifications:
-            return "No justifications available."
+            return RESPONSE_CONFIG['default_justification']
         
         if len(justifications) == 1:
             return justifications[0]
@@ -714,4 +742,4 @@ class MultiEvaluationService:
             if justification.strip():
                 combined.append(f"Judge {i}: {justification.strip()}")
         
-        return "\n\n".join(combined) if combined else "No justifications available." 
+        return "\n\n".join(combined) if combined else RESPONSE_CONFIG['default_justification'] 

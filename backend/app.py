@@ -237,19 +237,16 @@ def api_compare_evaluate():
 
 @app.route('/api/examples')
 def api_examples():
-    """Return a dictionary of example sentences for the playground."""
-    return jsonify(EXAMPLES)
-
-@app.route('/api/examples/<language>')
-def api_examples_by_language(language):
-    """Return examples for a specific language."""
+    """Return example sentences for all languages."""
     try:
-        if language in EXAMPLES:
-            return jsonify({"success": True, "examples": EXAMPLES[language]})
-        else:
-            return jsonify({"success": False, "error": f"No examples found for language: {language}"})
+        # Always return all examples
+        return jsonify({
+            "success": True,
+            "languages": list(EXAMPLES.keys()),
+            "examples": EXAMPLES
+        })
     except Exception as e:
-        logger.error(f"Error getting examples for language {language}: {e}")
+        logger.error(f"Error getting examples: {e}")
         return jsonify({"success": False, "error": str(e)})
 
 @app.route('/api/history')
@@ -375,10 +372,14 @@ def api_text_to_speech():
             "success": True,
             "audio_data": result['audio_data'],
             "format": result['format'],
-            "voice_id": result['voice_id']
+            "voice_id": result['voice_id'],
+            "text_length": result.get('text_length', 0)
         })
     else:
-        return jsonify({"success": False, "error": result['error']})
+        return jsonify({
+            "success": False, 
+            "error": result['error']
+        })
 
 @app.route('/api/tts/voices', methods=['GET'])
 def api_get_tts_voices():

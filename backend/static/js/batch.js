@@ -257,7 +257,8 @@ class PlaygroundDashboard {
         try {
             const response = await fetch('/api/examples');
             if (!response.ok) throw new Error('Failed to fetch examples.');
-            this.examples = await response.json();
+            const data = await response.json();
+            this.examples = data.examples;
             this.populateExamples();
         } catch (error) {
             console.error("Could not load examples:", error);

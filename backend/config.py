@@ -8,14 +8,28 @@ load_dotenv()
 # Get the project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
 
-# Language mapping
+# Language mapping - 支持20种语言
 LANGUAGES = {
-    'en': 'English',
-    'zh': '中文',
-    'ja': '日本語',
-    'pt': 'Português',
-    'es': 'Español',
-    'ko': '한국어'
+    'en': 'English',        # 英语
+    'zh': '中文',           # 中文
+    'ja': '日本語',         # 日语
+    'pt': 'Português',      # 葡萄牙语
+    'es': 'Español',        # 西班牙语
+    'ko': '한국어',         # 韩语
+    'fr': 'Français',       # 法语
+    'de': 'Deutsch',        # 德语
+    'it': 'Italiano',       # 意大利语
+    'ru': 'Русский',        # 俄语
+    'nl': 'Nederlands',     # 荷兰语
+    'sv': 'Svenska',        # 瑞典语
+    'no': 'Norsk',          # 挪威语
+    'da': 'Dansk',          # 丹麦语
+    'fi': 'Suomi',          # 芬兰语
+    'pl': 'Polski',         # 波兰语
+    'cs': 'Čeština',        # 捷克语
+    'hu': 'Magyar',         # 匈牙利语
+    'tr': 'Türkçe',         # 土耳其语
+    'ar': 'العربية'         # 阿拉伯语
 }
 
 # Default version tag (can be overridden via env)
@@ -165,4 +179,20 @@ LOGGING_CONFIG = {
     'format': os.environ.get('LOG_FORMAT', 
         '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d in %(funcName)s] - %(message)s'
     )
-} 
+}
+
+# 简化的API配置
+API_CONFIG = {
+    'timeout': int(os.environ.get('API_REQUEST_TIMEOUT', '60')),
+    'max_workers': int(os.environ.get('MAX_WORKERS', '10'))
+}
+
+# 简化的响应解析配置
+RESPONSE_CONFIG = {
+    'score_prefix': 'SCORE:',
+    'justification_prefix': 'JUSTIFICATION:',
+    'default_score': 'N/A',
+    'default_justification': 'No justification provided.'
+}
+
+ 

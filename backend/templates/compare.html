@@ -607,12 +607,12 @@
             const sourceLang = document.getElementById('source-lang').value;
             
             // 从后端获取示例数据
-            fetch(`/api/examples/${sourceLang}`)
+            fetch('/api/examples')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success && data.examples) {
+                    if (data.success && data.examples && data.examples[sourceLang]) {
                         container.innerHTML = '';
-                        data.examples.forEach(category => {
+                        data.examples[sourceLang].forEach(category => {
                             const button = document.createElement('button');
                             button.type = 'button';
                             button.className = 'btn btn-outline-primary';

@@ -41,6 +41,7 @@ Below are some key UI pages to give you a quick feel of the Translation Evaluati
 4. Click "Multi-Model Compare" to access the comparison interface
 
 **New Features:**
+- **20 Language Translation Support**: Complete example sentences for 20 languages with cultural nuances
 - **12 Model Support**: Compare up to 12 different translation models simultaneously
 - **Hunyuan Translation**: Built-in support for Tencent's Hunyuan translation service
 - **Multi-Judge Evaluation**: Get scores from up to 2 different AI evaluators
@@ -57,26 +58,26 @@ Below are some key UI pages to give you a quick feel of the Translation Evaluati
 
 ### Supported Languages
 
-- 🇺🇸 English (`en`)
-- 🇨🇳 Chinese (`zh`)
-- 🇯🇵 Japanese (`ja`)
-- 🇧🇷 Portuguese (`pt`)
-- 🇪🇸 Spanish (`es`)
-- 🇫🇷 French (`fr`)
-- 🇩🇪 German (`de`)
-- 🇮🇹 Italian (`it`)
-- 🇰🇷 Korean (`ko`)
-- 🇷🇺 Russian (`ru`)
-- 🇳🇱 Dutch (`nl`)
-- 🇸🇪 Swedish (`sv`)
-- 🇳🇴 Norwegian (`no`)
-- 🇩🇰 Danish (`da`)
-- 🇫🇮 Finnish (`fi`)
-- 🇵🇱 Polish (`pl`)
-- 🇨🇿 Czech (`cs`)
-- 🇭🇺 Hungarian (`hu`)
-- 🇹🇷 Turkish (`tr`)
-- 🇦🇷 Arabic (`ar`)
+- 🇺🇸 English (`en`) - Complete examples with idioms, grammar challenges
+- 🇨🇳 Chinese (`zh`) - 中文例句，包含成语、歧义等
+- 🇯🇵 Japanese (`ja`) - 日本語例文、敬語・慣用句含む
+- 🇧🇷 Portuguese (`pt`) - Português com expressões idiomáticas
+- 🇪🇸 Spanish (`es`) - Español con modismos y subjuntivo
+- 🇫🇷 French (`fr`) - Français avec expressions et subjonctif
+- 🇩🇪 German (`de`) - Deutsch mit Redewendungen und Konjunktiv
+- 🇮🇹 Italian (`it`) - Italiano con modi di dire e congiuntivo
+- 🇰🇷 Korean (`ko`) - 한국어 관용구 및 복잡한 문법 포함
+- 🇷🇺 Russian (`ru`) - Русский с идиомами и падежами
+- 🇳🇱 Dutch (`nl`) - Nederlands met uitdrukkingen
+- 🇸🇪 Swedish (`sv`) - Svenska med idiom och uttryck
+- 🇳🇴 Norwegian (`no`) - Norsk med idiomer og uttrykk
+- 🇩🇰 Danish (`da`) - Dansk med idiomer og udtryk
+- 🇫🇮 Finnish (`fi`) - Suomi idiomeineen ja kielioppihaasteineen
+- 🇵🇱 Polish (`pl`) - Polski z idiomami i trudną gramatyką
+- 🇨🇿 Czech (`cs`) - Čeština s idiomy a těžkou gramatikou
+- 🇭🇺 Hungarian (`hu`) - Magyar idiómákkal és nyelvtannal
+- 🇹🇷 Turkish (`tr`) - Türkçe deyimler ve karmaşık dilbilgisi
+- 🇦🇷 Arabic (`ar`) - العربية مع التعبيرات الاصطلاحية
 
 240 translation directions are supported between these languages.
 

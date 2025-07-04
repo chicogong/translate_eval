@@ -161,9 +161,13 @@ Convert text to speech using MiniMax T2A V2 API.
   "success": true,
   "audio_data": "base64_encoded_audio_data",
   "format": "mp3",
-  "voice_id": "male-01"
+  "voice_id": "male-qn-qingse",
+              "text_length": 11
 }
 ```
+
+**Timing Fields:**
+- `ttft_ms`: Time to First Token in milliseconds (only for translation API)
 
 **Example Usage:**
 ```bash
@@ -365,7 +369,52 @@ curl -X POST http://localhost:8888/api/batch-evaluate \
   }'
 ```
 
-### 10. Playground Run
+### 10. Get Examples
+
+Get example sentences for testing translation quality.
+
+**Endpoint:** `GET /api/examples`
+
+**Query Parameters:**
+- `language` (string, optional): Language code to filter examples (e.g., 'en', 'zh', 'ja')
+
+**Response (All Examples):**
+```json
+{
+  "success": true,
+  "languages": ["en", "zh", "ja", "es", "pt", "ko", "fr", "de", "it", "ru", "nl", "sv", "no", "da", "fi", "pl", "cs", "hu", "tr", "ar"],
+  "examples": {
+    "en": [
+      {
+        "label": "Polysemy & Ambiguity",
+        "texts": [
+          "The bank by the river was closed.",
+          "I saw her duck under the table."
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Response (Specific Language):**
+```json
+{
+  "success": true,
+  "language": "en",
+  "examples": [
+    {
+      "label": "Polysemy & Ambiguity",
+      "texts": [
+        "The bank by the river was closed.",
+        "I saw her duck under the table."
+      ]
+    }
+  ]
+}
+```
+
+### 11. Playground Run
 
 Run translation and evaluation for multiple texts in real-time.
 
@@ -405,6 +454,15 @@ Run translation and evaluation for multiple texts in real-time.
 
 All API endpoints return JSON responses with a `success` field indicating the operation status.
 
+**Error Response Format:**
+
+```json
+{
+  "success": false,
+  "error": "API key not found or invalid"
+}
+```
+
 **Common Error Responses:**
 
 ```json
@@ -424,7 +482,7 @@ All API endpoints return JSON responses with a `success` field indicating the op
 ```json
 {
   "success": false,
-  "error": "Translation API key not found"
+  "error": "API key not found or invalid"
 }
 ```
 

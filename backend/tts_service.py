@@ -26,7 +26,7 @@ class TTSService:
             language: 语言代码 (en, zh, ja, pt, es)
             
         Returns:
-            dict: 包含success状态和音频数据的字典
+            dict: 包含success状态、音频数据和耗时信息的字典
         """
         logger.info(f"Starting TTS conversion: language={language}, text_length={len(text)}")
         
@@ -73,8 +73,7 @@ class TTSService:
             # 添加Group ID到URL参数
             url = f"{self.config['api_url']}?GroupId={self.config['group_id']}"
             
-            logger.info(f"Making TTS API call to {url}")
-            logger.debug(f"Request data: {json.dumps(request_data, ensure_ascii=False, indent=2)}")
+            logger.info(f"TTS API Request: {url} | Data: {json.dumps(request_data, ensure_ascii=False)}")
             
             response = requests.post(
                 url,
@@ -86,7 +85,7 @@ class TTSService:
             response.raise_for_status()
             response_data = response.json()
             
-            logger.info(f"TTS API response received, status: {response.status_code}")
+            logger.info(f"TTS API Response: status={response.status_code} | data={json.dumps(response_data, ensure_ascii=False)}")
             
             # 检查响应格式
             # MiniMax API 返回格式: {"data": {"audio": "base64_data"}, "base_resp": {"status_code": 0}}
@@ -111,14 +110,23 @@ class TTSService:
                 status_msg = response_data.get('base_resp', {}).get('status_msg', 'unknown')
                 logger.error(f"TTS API error - status_code: {status_code}, status_msg: {status_msg}")
                 logger.error(f"Full response: {json.dumps(response_data, ensure_ascii=False, indent=2)}")
-                return {"success": False, "error": f"TTS API error: {status_msg} (code: {status_code})"}
+                return {
+                    "success": False, 
+                    "error": f"TTS API error: {status_msg} (code: {status_code})"
+                }
                 
         except requests.exceptions.RequestException as e:
             logger.error(f"TTS API request failed: {e}")
-            return {"success": False, "error": f"API request failed: {str(e)}"}
+            return {
+                "success": False, 
+                "error": f"API request failed: {str(e)}"
+            }
         except Exception as e:
             logger.error(f"Unexpected error during TTS conversion: {e}")
-            return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            return {
+                "success": False, 
+                "error": f"Unexpected error: {str(e)}"
+            }
     
     def get_supported_voices(self, language: str = None) -> Dict:
         """
