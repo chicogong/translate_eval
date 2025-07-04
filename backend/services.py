@@ -9,6 +9,7 @@ from typing import Dict, Generator, Optional, List
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from config import get_translation_config, get_evaluation_config, get_multi_translation_configs, get_multi_evaluation_configs
 from prompts import get_translation_prompt, get_evaluation_prompt
+from hunyuan_service import HunyuanTranslationService
 
 logger = logging.getLogger(__name__)
 
@@ -341,6 +342,10 @@ class MultiModelTranslationService:
                                top_p: Optional[float] = None) -> Dict:
         """使用单个模型进行翻译"""
         config = self.configs[model_id]
+        
+        # 检查是否为混元翻译模型
+        if HunyuanTranslationService.is_hunyuan_model(config):
+            return HunyuanTranslationService.translate(config, source_lang, target_lang, text)
         
         # 使用传入的参数或配置默认值
         use_stream = stream if stream is not None else config['stream']

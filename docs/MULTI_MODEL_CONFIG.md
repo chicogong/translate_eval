@@ -1,14 +1,14 @@
 # Multi-Model Translation Configuration
 
-This document explains how to configure multiple translation models for comparison.
+This document explains how to configure multiple translation models for comparison and evaluation.
 
 ## Configuration Method
 
 Add the following environment variables to your `.env` file or set them as system environment variables.
 
-### Multi-Model Configuration (up to 6 models)
+### Multi-Model Configuration (No Limit)
 
-For each model, you need to configure the following variables where `N` is the model number (1-6):
+For each model, you need to configure the following variables where `N` is the model number (1, 2, 3, ...):
 
 ```bash
 # Model N Configuration
@@ -24,9 +24,27 @@ TRANSLATION_NUM_BEAMS_N=1                         # Optional, defaults to 1
 TRANSLATION_DO_SAMPLE_N=false                     # Optional, defaults to false
 ```
 
+### Multi-Evaluator Configuration (up to 2 evaluators)
+
+For evaluation, you can configure up to 2 different evaluator models:
+
+```bash
+# Primary Evaluator
+EVALUATION_API_KEY=your-primary-evaluator-key
+EVALUATION_API_URL=your-primary-evaluator-url
+EVALUATION_MODEL=your-primary-evaluator-model
+EVALUATION_MODEL_NAME=Primary Evaluator  # Optional
+
+# Secondary Evaluator (optional)
+EVALUATION_API_KEY_2=your-secondary-evaluator-key
+EVALUATION_API_URL_2=your-secondary-evaluator-url
+EVALUATION_MODEL_2=your-secondary-evaluator-model
+EVALUATION_MODEL_NAME_2=Secondary Evaluator  # Optional
+```
+
 ### Example Configuration
 
-Based on your provided models, here's how to configure them:
+Here's how to configure multiple translation models:
 
 ```bash
 # Model 1: DeepSeek V3 Local
@@ -53,17 +71,31 @@ TRANSLATION_API_URL_4=http://xxx.com/llmproxy/chat/completions
 TRANSLATION_MODEL_4=xxx
 TRANSLATION_MODEL_NAME_4=xxx
 
-# Model 5: Server 261571
-TRANSLATION_API_KEY_5=xxx
-TRANSLATION_API_URL_5=http://xxx.com/llmproxy/chat/completions
-TRANSLATION_MODEL_5=xxx
-TRANSLATION_MODEL_NAME_5=xxx
+# Model 5: Hunyuan Translation (Special Configuration)
+TRANSLATION_API_KEY_5=your-hunyuan-api-key
+TRANSLATION_API_URL_5=http://hunyuanapi.xxx.com/openapi/v1/translations
+TRANSLATION_MODEL_5=hunyuan-translation-lite
+TRANSLATION_MODEL_NAME_5=Hunyuan Translation Lite
 
-# Model 6: DeepSeek V3 Local II
-TRANSLATION_API_KEY_6=xxx
-TRANSLATION_API_URL_6=http://xxx.com/llmproxy/chat/completions
-TRANSLATION_MODEL_6=xxx
-TRANSLATION_MODEL_NAME_6=xxx
+# Additional models can be configured by incrementing the number
+# Model 6, 7, 8, ... (no limit)
+# TRANSLATION_API_KEY_N=your-api-key-n
+# TRANSLATION_API_URL_N=your-api-url-n
+# TRANSLATION_MODEL_N=your-model-name-n
+# TRANSLATION_MODEL_NAME_N=Your Model Display Name N
+
+# Evaluation Models
+# Primary Evaluator
+EVALUATION_API_KEY=your-primary-evaluator-key
+EVALUATION_API_URL=your-primary-evaluator-url
+EVALUATION_MODEL=your-primary-evaluator-model
+EVALUATION_MODEL_NAME=Primary Judge
+
+# Secondary Evaluator (optional)
+EVALUATION_API_KEY_2=your-secondary-evaluator-key
+EVALUATION_API_URL_2=your-secondary-evaluator-url
+EVALUATION_MODEL_2=your-secondary-evaluator-model
+EVALUATION_MODEL_NAME_2=Secondary Judge
 ```
 
 ## Usage
@@ -73,30 +105,56 @@ TRANSLATION_MODEL_NAME_6=xxx
 2. **API Endpoints**:
    - `GET /api/models` - Get available models
    - `POST /api/translate/compare` - Compare translations from multiple models
+   - `POST /api/evaluate/compare` - Evaluate translations from multiple models
+   - `GET /api/examples/<language>` - Get translation challenge examples for specific language
 
-3. **Model Selection**: You can select 2-6 models for comparison. The system will automatically use the first two models by default.
+3. **Model Selection**: You can select any number of models for comparison (no limit). The system will process all selected models in parallel.
+
+4. **Evaluation**: After translation, you can evaluate all results with up to 2 different evaluators for comprehensive scoring.
 
 ## Features
 
+- **Unlimited Models**: Support for any number of translation models (no artificial limits)
 - **Parallel Translation**: All selected models translate simultaneously for faster results
+- **Multi-Evaluator Support**: Up to 2 different evaluators can score translations
+- **Dynamic Examples**: Language-specific translation challenge examples with common pitfalls
+- **Comprehensive Scoring**: Get detailed evaluation from multiple perspectives
 - **Error Handling**: Failed translations are clearly marked while successful ones are displayed
 - **Copy Functionality**: Easy one-click copying of translation results
 - **Responsive Design**: Works well on different screen sizes
+- **Modular Architecture**: Hunyuan translation service separated for easy maintenance
 
 ## Backward Compatibility
 
-The original single-model configuration is still supported:
+The original single-model and single-evaluator configurations are still supported:
 
 ```bash
+# Single model
 TRANSLATION_API_KEY=your-api-key
 TRANSLATION_API_URL=your-api-url
 TRANSLATION_MODEL=your-model-name
-```
 
-If no multi-model configurations are found, the system will fall back to the single model configuration.
+# Single evaluator
+EVALUATION_API_KEY=your-evaluation-api-key
+EVALUATION_API_URL=your-evaluation-api-url
+EVALUATION_MODEL=your-evaluation-model
+```
 
 ## Notes
 
-- Only the first 6 model configurations will be loaded (TRANSLATION_API_KEY_1 through TRANSLATION_API_KEY_6)
-- All three required fields (API_KEY, API_URL, MODEL) must be present for a model to be available
-- The evaluation model configuration remains unchanged and uses the original `EVALUATION_*` variables 
+- **No Model Limit**: The system will load all available model configurations (TRANSLATION_API_KEY_1, TRANSLATION_API_KEY_2, ..., TRANSLATION_API_KEY_N)
+- Up to 2 evaluators are supported (primary and secondary)
+- All three required fields (API_KEY, API_URL, MODEL) must be present for a model/evaluator to be available
+- Evaluation results from multiple evaluators are averaged for the final score
+- **Translation Challenge Examples**: Each language includes carefully curated examples of common translation pitfalls:
+  - Polysemy and ambiguity
+  - Idioms and cultural references
+  - Complex grammar structures
+  - False friends and cognates
+  - Modern slang and colloquialisms
+- **Hunyuan Translation Support**: Models with 'hunyuan' in the model name or 'hunyuanapi.woa.com' in the API URL will automatically use the Hunyuan translation protocol
+- **Special Features**:
+  - Hunyuan models support automatic language code mapping (zh → zh-CN, etc.)
+  - Moderation can be configured per model (set `moderation: false` in config for faster translation)
+  - All models support parallel translation for optimal performance
+  - Modular service architecture allows easy addition/removal of special translation services 

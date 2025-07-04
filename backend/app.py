@@ -165,9 +165,7 @@ def api_compare_translate():
         logger.warning("No model IDs provided")
         return jsonify({"success": False, "error": "At least one model ID is required"})
     
-    if len(model_ids) > 6:
-        logger.warning("Too many model IDs provided")
-        return jsonify({"success": False, "error": "Maximum 6 models are supported"})
+
     
     # Validate language pair
     is_valid, error_msg = validate_language_pair(source_lang, target_lang)
@@ -241,6 +239,18 @@ def api_compare_evaluate():
 def api_examples():
     """Return a dictionary of example sentences for the playground."""
     return jsonify(EXAMPLES)
+
+@app.route('/api/examples/<language>')
+def api_examples_by_language(language):
+    """Return examples for a specific language."""
+    try:
+        if language in EXAMPLES:
+            return jsonify({"success": True, "examples": EXAMPLES[language]})
+        else:
+            return jsonify({"success": False, "error": f"No examples found for language: {language}"})
+    except Exception as e:
+        logger.error(f"Error getting examples for language {language}: {e}")
+        return jsonify({"success": False, "error": str(e)})
 
 @app.route('/api/history')
 def api_history():

@@ -330,7 +330,7 @@ class TestMultiModelConfig(unittest.TestCase):
         'TRANSLATION_API_KEY_2': 'key2',
         'TRANSLATION_API_URL_2': 'url2',
         'TRANSLATION_MODEL_2': 'model2',
-    })
+    }, clear=True)
     def test_multi_model_config_loading(self):
         """测试多模型配置加载"""
         from backend.config import get_multi_translation_configs
@@ -359,7 +359,7 @@ class TestMultiModelConfig(unittest.TestCase):
         'TRANSLATION_API_KEY_2': 'key2',
         'TRANSLATION_API_URL_2': 'url2',
         'TRANSLATION_MODEL_2': 'model2',
-    })
+    }, clear=True)
     def test_incomplete_config_skipped(self):
         """测试不完整的配置被跳过"""
         from backend.config import get_multi_translation_configs
@@ -389,6 +389,153 @@ class TestMultiModelConfig(unittest.TestCase):
         self.assertEqual(len(configs), 1)
         self.assertEqual(configs['model_1']['api_key'], 'single_key')
         self.assertEqual(configs['model_1']['name'], 'single_model')
+
+
+class TestHunyuanTranslation(unittest.TestCase):
+    """混元翻译测试"""
+    
+    def setUp(self):
+        """设置测试环境"""
+        self.hunyuan_config = {
+            'model_hunyuan': {
+                'id': 'model_hunyuan',
+                'name': 'Hunyuan Translation',
+                'api_key': 'test_hunyuan_key',
+                'api_url': 'http://hunyuanapi.xxx.com/openapi/v1/translations',
+                'model': 'hunyuan-translation-lite',
+                'stream': False,
+                'temperature': 0.0,
+                'max_length': 16384,
+                'top_p': 1.0,
+                'num_beams': 1,
+                'do_sample': False,
+                'moderation': False
+            }
+        }
+    
+    @patch('backend.services.get_multi_translation_configs')
+    def test_hunyuan_model_detection(self, mock_get_configs):
+        """测试混元模型检测"""
+        mock_get_configs.return_value = self.hunyuan_config
+        service = MultiModelTranslationService()
+        
+        config = self.hunyuan_config['model_hunyuan']
+        self.assertTrue(service._is_hunyuan_translation_model(config))
+        
+        # Test with non-hunyuan model
+        regular_config = {
+            'model': 'gpt-3.5-turbo',
+            'api_url': 'https://api.openai.com/v1/chat/completions'
+        }
+        self.assertFalse(service._is_hunyuan_translation_model(regular_config))
+    
+    @patch('backend.services.get_multi_translation_configs')
+    @patch('backend.services.requests.post')
+    def test_hunyuan_translation_success(self, mock_post, mock_get_configs):
+        """测试混元翻译成功"""
+        mock_get_configs.return_value = self.hunyuan_config
+        service = MultiModelTranslationService()
+        
+        # Mock successful Hunyuan response
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.raise_for_status.return_value = None
+        mock_response.json.return_value = {
+            'choices': [
+                {'message': {'content': 'Hello world'}}
+            ]
+        }
+        mock_post.return_value = mock_response
+        
+        result = service.translate_with_multiple_models(
+            'zh', 'en', '你好世界', ['model_hunyuan']
+        )
+        
+        self.assertTrue(result['success'])
+        self.assertTrue(result['results']['model_hunyuan']['success'])
+        self.assertEqual(result['results']['model_hunyuan']['translation'], 'Hello world')
+        
+        # Check that the request was made with correct Hunyuan format
+        call_args = mock_post.call_args
+        headers = call_args[1]['headers']
+        self.assertEqual(headers['X-TC-Action'], 'ChatTranslations')
+        self.assertEqual(headers['X-TC-Version'], '2023-09-01')
+        self.assertIn('X-TC-Timestamp', headers)
+        
+        request_data = json.loads(call_args[1]['data'])
+        self.assertEqual(request_data['model'], 'hunyuan-translation-lite')
+        self.assertEqual(request_data['target'], 'en')
+        self.assertEqual(request_data['text'], '你好世界')
+        self.assertEqual(request_data['stream'], False)
+        self.assertEqual(request_data['moderation'], False)
+    
+    @patch('backend.services.get_multi_translation_configs')
+    @patch('backend.services.requests.post')
+    def test_hunyuan_language_mapping(self, mock_post, mock_get_configs):
+        """测试混元翻译语言代码映射"""
+        mock_get_configs.return_value = self.hunyuan_config
+        service = MultiModelTranslationService()
+        
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.raise_for_status.return_value = None
+        mock_response.json.return_value = {
+            'choices': [
+                {'message': {'content': 'Test translation'}}
+            ]
+        }
+        mock_post.return_value = mock_response
+        
+        # Test zh -> zh-CN mapping
+        result = service.translate_with_multiple_models(
+            'en', 'zh', 'Hello', ['model_hunyuan']
+        )
+        
+        call_args = mock_post.call_args
+        request_data = json.loads(call_args[1]['data'])
+        self.assertEqual(request_data['target'], 'zh-CN')
+    
+    @patch('backend.services.get_multi_translation_configs')
+    @patch('backend.services.requests.post')
+    def test_hunyuan_translation_error(self, mock_post, mock_get_configs):
+        """测试混元翻译错误处理"""
+        mock_get_configs.return_value = self.hunyuan_config
+        service = MultiModelTranslationService()
+        
+        # Mock API error
+        mock_post.side_effect = Exception("API Error")
+        
+        result = service.translate_with_multiple_models(
+            'zh', 'en', '你好', ['model_hunyuan']
+        )
+        
+        self.assertTrue(result['success'])  # Overall success
+        self.assertFalse(result['results']['model_hunyuan']['success'])  # Individual failure
+        self.assertIn('Hunyuan translation error', result['results']['model_hunyuan']['error'])
+    
+    @patch('backend.services.get_multi_translation_configs')
+    @patch('backend.services.requests.post')
+    def test_hunyuan_invalid_response(self, mock_post, mock_get_configs):
+        """测试混元翻译无效响应"""
+        mock_get_configs.return_value = self.hunyuan_config
+        service = MultiModelTranslationService()
+        
+        # Mock invalid response format
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.raise_for_status.return_value = None
+        mock_response.json.return_value = {
+            'error': 'Invalid request'
+        }
+        mock_post.return_value = mock_response
+        
+        result = service.translate_with_multiple_models(
+            'zh', 'en', '你好', ['model_hunyuan']
+        )
+        
+        self.assertTrue(result['success'])
+        self.assertFalse(result['results']['model_hunyuan']['success'])
+        self.assertIn('Invalid Hunyuan translation response format', result['results']['model_hunyuan']['error'])
 
 
 if __name__ == '__main__':

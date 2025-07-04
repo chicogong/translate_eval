@@ -38,6 +38,13 @@ Below are some key UI pages to give you a quick feel of the Translation Evaluati
 1. Set up the environment variables in `.env` file according to [MULTI_MODEL_CONFIG.md](docs/MULTI_MODEL_CONFIG.md)
 2. Run the app: `python run_app.py`
 3. Open your browser at [http://127.0.0.1:8888](http://127.0.0.1:8888)
+4. Click "Multi-Model Compare" to access the comparison interface
+
+**New Features:**
+- **12 Model Support**: Compare up to 12 different translation models simultaneously
+- **Hunyuan Translation**: Built-in support for Tencent's Hunyuan translation service
+- **Multi-Judge Evaluation**: Get scores from up to 2 different AI evaluators
+- **Enhanced UI**: Beautiful, responsive interface with improved model cards and evaluation displays
 
 ### Batch Processing Features
 

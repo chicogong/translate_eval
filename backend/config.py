@@ -38,19 +38,20 @@ def get_translation_config():
 
 # Multi-model translation configuration
 def get_multi_translation_configs():
-    """获取多个翻译API配置，最多支持9个模型"""
+    """获取多个翻译API配置，无数量限制"""
     configs = {}
     
-    # Load up to 9 model configurations
-    for i in range(1, 9):
+    # Load all available model configurations (no limit)
+    i = 1
+    while True:
         api_key = os.environ.get(f'TRANSLATION_API_KEY_{i}')
         api_url = os.environ.get(f'TRANSLATION_API_URL_{i}')
         model = os.environ.get(f'TRANSLATION_MODEL_{i}')
         model_name = os.environ.get(f'TRANSLATION_MODEL_NAME_{i}')
         
-        # Skip if any required config is missing
+        # Break if any required config is missing
         if not all([api_key, api_url, model]):
-            continue
+            break
             
         # Use model name if provided, otherwise use model ID
         display_name = model_name if model_name else model
@@ -68,6 +69,8 @@ def get_multi_translation_configs():
             'num_beams': int(os.environ.get(f'TRANSLATION_NUM_BEAMS_{i}', '1')),
             'do_sample': os.environ.get(f'TRANSLATION_DO_SAMPLE_{i}', 'false').lower() == 'true'
         }
+        
+        i += 1  # 继续查找下一个模型配置
     
     # Fallback to single model config if no multi-model configs found
     if not configs:

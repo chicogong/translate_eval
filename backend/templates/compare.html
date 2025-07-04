@@ -12,7 +12,7 @@
             border: 2px solid #dee2e6;
             border-radius: 12px;
             transition: all 0.3s ease;
-            min-height: 250px;
+            min-height: 280px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -33,13 +33,151 @@
             border-color: #0d6efd;
             background: linear-gradient(135deg, #cce7ff 0%, #f0f8ff 100%);
         }
-        .model-selector {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
+        
+        /* 模型选择卡片样式 */
+        .model-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .model-selection-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .model-selection-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        }
+        .model-selection-card.selected {
+            border-color: #0d6efd;
+            background: linear-gradient(135deg, #e7f3ff 0%, #f8fbff 100%);
+            box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+        }
+        .model-selection-card .model-checkbox {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        .model-selection-card .model-info {
+            margin-right: 40px;
+        }
+        .model-selection-card .model-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        .model-selection-card .model-subtitle {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        /* 选择控制按钮 */
+        .selection-controls {
+            margin-bottom: 20px;
             padding: 15px;
             background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .selection-controls .btn-group {
+            gap: 10px;
+        }
+        
+        /* 评分显示优化 */
+        .score-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            margin: -15px -15px 15px -15px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        /* Settings卡片美化 */
+        .settings-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+        .settings-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            position: relative;
+        }
+        .settings-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ffc107 0%, #fd7e14 50%, #dc3545 100%);
+        }
+        .settings-body {
+            padding: 25px;
+            position: relative;
+        }
+        .settings-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #0d6efd 50%, transparent 100%);
+        }
+        
+        /* 示例按钮样式 */
+        #example-buttons {
+            gap: 8px;
+        }
+        #example-buttons .btn {
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #495057;
+            position: relative;
+            overflow: hidden;
+        }
+        #example-buttons .btn:hover {
+            background: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+        #example-buttons .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        #example-buttons .btn:hover::before {
+            left: 100%;
         }
         .translation-result {
             min-height: 100px;
@@ -105,9 +243,22 @@
         }
         .comparison-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
             margin-top: 20px;
+        }
+        
+        /* Responsive grid for better display with more models */
+        @media (min-width: 1200px) {
+            .comparison-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            }
+        }
+        
+        @media (min-width: 1600px) {
+            .comparison-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
         }
         .evaluation-controls {
             text-align: center;
@@ -190,11 +341,11 @@
             <!-- Input Section -->
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
+                    <div class="card settings-card">
+                        <div class="card-header settings-header">
                             <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Translation Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body settings-body">
                             <!-- Language Selection -->
                             <div class="row mb-3">
                                 <div class="col-md-5">
@@ -226,11 +377,51 @@
                             <!-- Model Selection -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Select Models for Comparison (2-6 models)</label>
-                                    <div class="model-selector" id="model-selector">
+                                    <label class="form-label">Select Models for Comparison</label>
+                                    
+                                    <!-- Selection Controls -->
+                                    <div class="selection-controls">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="text-muted">Quick Selection:</span>
+                                            </div>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-outline-primary btn-sm" id="select-all-btn">
+                                                    <i class="fas fa-check-double me-1"></i>Select All
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" id="select-none-btn">
+                                                    <i class="fas fa-times me-1"></i>Clear All
+                                                </button>
+                                                <button type="button" class="btn btn-outline-info btn-sm" id="select-top-btn">
+                                                    <i class="fas fa-star me-1"></i>Top 8
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <span id="selected-count">0</span> models selected 
+                                                <span class="text-info" id="selection-info" style="display: none;">
+                                                    (More models = better comparison)
+                                                </span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Model Cards Grid -->
+                                    <div class="model-selector-grid" id="model-selector">
                                         <div class="text-center text-muted">
                                             <i class="fas fa-spinner fa-spin me-2"></i>Loading available models...
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Example Texts -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Load Examples:</label>
+                                    <div id="example-buttons" class="btn-group btn-group-sm flex-wrap mb-2" role="group">
+                                        <!-- Example buttons will be populated here -->
                                     </div>
                                 </div>
                             </div>
@@ -308,11 +499,14 @@
         let availableEvaluators = [];
         let currentTranslations = {};
 
+
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadAvailableModels();
             loadAvailableEvaluators();
             setupEventListeners();
+            renderExampleButtons();
         });
 
         function loadAvailableModels() {
@@ -366,13 +560,16 @@
 
             availableModels.forEach(model => {
                 const div = document.createElement('div');
-                div.className = 'form-check mb-2';
+                div.className = 'model-selection-card';
+                div.onclick = () => toggleModel(model.id);
                 div.innerHTML = `
-                    <input class="form-check-input" type="checkbox" value="${model.id}" id="model-${model.id}">
-                    <label class="form-check-label" for="model-${model.id}">
-                        <strong>${model.name}</strong>
-                        <small class="text-muted d-block">${model.model}</small>
-                    </label>
+                    <div class="model-info">
+                        <div class="model-title">${model.name}</div>
+                        <div class="model-subtitle">${model.model}</div>
+                    </div>
+                    <input class="form-check-input model-checkbox" type="checkbox" 
+                           id="model-${model.id}" value="${model.id}"
+                           onclick="event.stopPropagation();" onchange="updateSelectedModels()">
                 `;
                 container.appendChild(div);
             });
@@ -385,9 +582,86 @@
             }
         }
 
+        function toggleModel(modelId) {
+            const checkbox = document.getElementById(`model-${modelId}`);
+            const card = checkbox.closest('.model-selection-card');
+            
+            checkbox.checked = !checkbox.checked;
+            updateSelectedModels();
+        }
+
+        function showSelectionInfo() {
+            const info = document.getElementById('selection-info');
+            info.style.display = 'inline';
+            setTimeout(() => {
+                info.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateSelectedCount() {
+            document.getElementById('selected-count').textContent = selectedModels.length;
+        }
+
+        function renderExampleButtons() {
+            const container = document.getElementById('example-buttons');
+            const sourceLang = document.getElementById('source-lang').value;
+            
+            // 从后端获取示例数据
+            fetch(`/api/examples/${sourceLang}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.examples) {
+                        container.innerHTML = '';
+                        data.examples.forEach(category => {
+                            const button = document.createElement('button');
+                            button.type = 'button';
+                            button.className = 'btn btn-outline-primary';
+                            button.textContent = category.label;
+                            button.onclick = () => loadExampleTexts(category.texts);
+                            container.appendChild(button);
+                        });
+                    } else {
+                        container.innerHTML = '<small class="text-muted">No examples available for this language</small>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading examples:', error);
+                    container.innerHTML = '<small class="text-muted">Failed to load examples</small>';
+                });
+        }
+
+        function loadExampleTexts(texts) {
+            const randomText = texts[Math.floor(Math.random() * texts.length)];
+            document.getElementById('source-text').value = randomText;
+            document.getElementById('char-count').textContent = randomText.length;
+            updateCompareButtonState();
+        }
+
         function setupEventListeners() {
-            // Model selection
-            document.getElementById('model-selector').addEventListener('change', updateSelectedModels);
+            // Model selection controls
+            document.getElementById('select-all-btn').addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('#model-selector input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                updateSelectedModels();
+            });
+
+            document.getElementById('select-none-btn').addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('#model-selector input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                updateSelectedModels();
+            });
+
+            document.getElementById('select-top-btn').addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('#model-selector input[type="checkbox"]');
+                checkboxes.forEach((checkbox, index) => {
+                    checkbox.checked = index < 8;
+                });
+                updateSelectedModels();
+            });
 
             // Text input
             document.getElementById('source-text').addEventListener('input', function() {
@@ -402,7 +676,11 @@
                 const temp = sourceLang.value;
                 sourceLang.value = targetLang.value;
                 targetLang.value = temp;
+                renderExampleButtons();
             });
+
+            // Language change
+            document.getElementById('source-lang').addEventListener('change', renderExampleButtons);
 
             // Compare button
             document.getElementById('compare-btn').addEventListener('click', performComparison);
@@ -428,13 +706,24 @@
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
             
+            // Update card styles
+            checkboxes.forEach(checkbox => {
+                const card = checkbox.closest('.model-selection-card');
+                if (checkbox.checked) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+            
+            updateSelectedCount();
             updateCompareButtonState();
         }
 
         function updateCompareButtonState() {
             const text = document.getElementById('source-text').value.trim();
             const hasText = text.length > 0;
-            const hasModels = selectedModels.length >= 2 && selectedModels.length <= 6;
+            const hasModels = selectedModels.length >= 2;
             
             document.getElementById('compare-btn').disabled = !hasText || !hasModels;
         }
@@ -513,6 +802,12 @@
                 if (result.success) {
                     card.innerHTML = `
                         <div class="card-body">
+                            <!-- Score header (initially hidden) -->
+                            <div class="score-header" id="score-header-${modelId}" style="display: none;">
+                                <div class="score-value">--/10</div>
+                                <div>AI Evaluation Score</div>
+                            </div>
+                            
                             <div class="model-name">
                                 <span><i class="fas fa-robot me-2"></i>${result.model_name}</span>
                                 <span class="model-badge">${result.model_id}</span>
@@ -645,8 +940,9 @@
             Object.entries(results).forEach(([modelId, evaluationResult]) => {
                 const card = document.getElementById(`card-${modelId}`);
                 const evalSection = document.getElementById(`eval-${modelId}`);
+                const scoreHeader = document.getElementById(`score-header-${modelId}`);
                 
-                if (card && evalSection) {
+                if (card && evalSection && scoreHeader) {
                     // Update card class to show it's evaluated
                     card.className = card.className.replace('success', 'evaluated');
                     
@@ -655,6 +951,13 @@
                     const avgScore = evaluationResult.average_score;
                     const justification = evaluationResult.combined_justification;
 
+                    // Update score header
+                    scoreHeader.innerHTML = `
+                        <div class="score-value">${avgScore}/10</div>
+                        <div>AI Evaluation Score</div>
+                    `;
+                    scoreHeader.style.display = 'block';
+
                     let evaluatorTags = '';
                     evaluatorDetails.forEach(detail => {
                         const scoreText = detail.success ? detail.score : 'Failed';
@@ -662,11 +965,8 @@
                     });
 
                     evalSection.innerHTML = `
-                        <div class="score-display">
-                            <span><strong>AI Evaluation Score:</strong></span>
-                            <span class="score-badge">${avgScore}/10</span>
-                        </div>
                         <div class="mb-2">
+                            <strong>Evaluators:</strong><br>
                             ${evaluatorTags}
                         </div>
                         <div class="justification-text">
